@@ -91,7 +91,6 @@ app.post('/login', (req, res) => {
 
         if (results.length > 0) {
             req.session.user = results[0];
-            req.flash('success', 'Login successful! Welcome to our website.');
             res.redirect('/dashboard');
         } else {
             req.flash('error', 'Invalid email or password.');
