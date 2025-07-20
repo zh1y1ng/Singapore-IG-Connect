@@ -7,14 +7,55 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <title>Singapore IG Connect</title>
     </head>
+<style>
+    body {
+        background-image: url('/image/loginregister_background.png'); 
+        background-size: cover;        
+        background-repeat: no-repeat;   
+        background-position: center;  
+        height: 100vh;
+        margin: 0;
+    }
+
+    h2 {
+        font-family: 'Montserrat';
+        font-size: 60px;
+        margin-top: 20px;
+    }
+
+    .form-container {
+        background-color: rgba(255, 255, 255, 0.85); 
+        padding: 30px;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 250px;
+        margin: auto;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); 
+    }
+
+    .form-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;    
+    }
+
+    .form-title {
+        font-weight: 700;
+        margin-bottom: -20px;
+        text-align: center;
+    }
+</style>
 <body>
-    <div class="container">
+    <div class="form-wrapper">
         <br>
-        <div class="text-center"><h2>Register</h2></div>
+        <div class="form-title"><h2>Register</h2></div>
         <br>
-        <div class="text-center">
+        <div class="form-container">
             <form action="/register" method="POST">
 
+                <div class="input-wrapper text-center">
                 <label for="username">Username:</label><br>
                 <input type="text" id="username" name="username" value="<%= formData.username || '' %>" required><br><br>
 
@@ -28,17 +69,20 @@
                 <input type="text" id="address" name="address" value="<%= formData.address || '' %>" required><br><br>
 
                 <label for="contact">Contact Number:</label><br>
-                <input type="text" id="contact" name="contact" class="form-control" required 
+                <input type="text" id="contact" name="contact" value="<%= formData.contact || '' %>" required 
                 <% if (formData && formData.contact){ %> value="<%= formData.contact %>" <% } else { %> value="" <% } %>><br><br>
 
                 <label for="role">Role:</label>
-                <select id="role" name="role" class="form-control" required>
+                <select id="role" name="role" value="<%= formData.role || '' %>" required>
                     <option value="user" <% if (formData && formData.role === 'user') { %> selected <% } %>>User</option>
                     <option value="admin" <% if (formData && formData.role === 'admin') { %> selected <% } %>>Admin</option>
                 </select>
                 <br><br>
-
+                </div>
+                
+                <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-primary">Register</button>
+                </div>
                 <br>
                 <br>
             </form>
