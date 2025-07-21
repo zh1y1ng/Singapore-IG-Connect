@@ -133,6 +133,86 @@ app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
     res.render('admin', { user: req.session.user });
 });
 
+// --- View all schools (Both user & admin) ---
+app.get('/schools', checkAuthentication, (req, res) => {
+    const query = 'SELECT * FROM schools';
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        res.render('schools/index', {
+            schools: results,
+            user: req.session.user
+        });
+    });
+});
+
+// --- Search school by name/location (Both user & admin) ---
+app.get('/schools/search', checkAuthentication, (req, res) => {
+    const keyword = req.query.keyword;
+    const query = `
+        SELECT * FROM schools 
+        WHERE name LIKE ? OR address LIKE ?
+    `;
+    db.query(query, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
+        if (err) throw err;
+        res.render('schools/index', {
+            schools: results,
+            user: req.session.user
+        });
+    });
+});
+
+// --- Show Add School Form (Admin only) ---
+app.get('/schools/addSchool', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('schools/addSchool', { user: req.session.user});
+});
+
+// --- Add School (Admin only) ---
+app.post('/schools', checkAuthentication, checkAdmin, (req, res) => {
+    const { name, address, contact_email, logo_url } = req.body;
+
+    if (!name || !address || !contact_email) {
+        req.flash('error', 'Please fill in all required fields.');
+        return res.redirect('/schools/addSchool');
+    }
+
+    const query = 'INSERT INTO schools (name, address, contact_email, logo_url) VALUES (?, ?, ?, ?)';
+    db.query(query, [name, address, contact_email, logo_url], (err) => {
+        if (err) throw err;
+        res.redirect('/schools');
+    });
+});
+
+// --- Show Edit Form (Admin only) ---
+app.get('/schools/editSchool/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const query = 'SELECT * FROM schools WHERE id = ?';
+    db.query(query, [id], (err, results) => {
+        if (err) throw err;
+        res.render('schools/editSchool', { school: results[0], user: req.session.user });
+    });
+});
+
+// --- Update School (Admin only) ---
+app.post('/schools/update/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const { name, address, contact_email, logo_url } = req.body;
+    const query = 'UPDATE schools SET name = ?, address = ?, contact_email = ?, logo_url = ? WHERE id = ?';
+    db.query(query, [name, address, contact_email, logo_url, req.params.id], (err) => {
+        if (err) throw err;
+        res.redirect('/schools');
+    });
+});
+
+// --- Delete School (Admin only) ---
+app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const query = 'DELETE FROM schools WHERE id = ?';
+    db.query(query, [id], (err) => {
+        if (err) throw err;
+        res.redirect('/schools');
+    });
+});
+
+
 app.listen(3000, () => {
     console.log('Server running on http://localhost:3000');
 });

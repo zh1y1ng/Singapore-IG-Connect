@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>School Directory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+</head>
+
+<style>
+  body {
+    background-image: url('/image/schools_background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  h2 {
+    font-size: 50px;
+    font-family: 'Montserrat';
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20vh;
+  }
+
+  td {
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  th {
+    font-family: 'Montserrat';
+    font-weight: bold;
+  }
+
+  a {
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  form {
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  a.btn {
+    font-family: 'Quicksand', sans-serif;
+  }
+</style>
+
+<body>
+
+<nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
+
+    <style>
+    nav a:hover {
+      text-decoration: underline !important;
+    }
+    </style>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="flex: 1; text-align: left;">
+      <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
+        Singapore IG Connect
+      </a>
+    </div>
+
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
+        <a href="/IGmembers" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/IGevents" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
+        <a href="/studentprofiles" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/IGgalleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+    </div>
+
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2>School Directory</h2>
+
+  <form action="/schools/search" method="get" class="mb-3">
+    <div class="input-group">
+    <input type="text" name="keyword" placeholder="Search by name or location" class="form-control" />
+    <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </form>
+
+  <% if (user.role === 'admin') { %>
+    <a href="/schools/addSchool" class="btn btn-success mb-3" >Add New School</a>
+  <% } %>
+
+  <table class="table table-bordered text-center">
+    <thead>
+      <tr>
+        <th class="text-center">Logo</th>
+        <th class="text-center">Name</th>
+        <th class="text-center">Address</th>
+        <th class="text-center">Contact Email</th>
+        <% if (user.role === 'admin') { %>
+          <th class="text-center">Actions</th>
+        <% } %>
+      </tr>
+    </thead>
+    <tbody>
+      <% schools.forEach(school => { %>
+        <tr>
+          <td class="text-center align-middle"><img src="<%= school.logo_url %>" width="80" /></td>
+          <td class="text-center align-middle"><%= school.name %></td>
+          <td class="text-center align-middle"><%= school.address %></td>
+          <td class="text-center align-middle"><%= school.contact_email %></td>
+          <% if (user.role === 'admin') { %>
+            <td class="text-center align-middle">
+              <a href="/schools/editSchool/<%= school.id %>" class="btn btn-warning btn-sm">Edit</a>
+              <form action="/schools/delete/<%= school.id %>" method="POST" style="display:inline;">
+                <button class="btn btn-danger btn-sm" onclick="return confirm('Delete this school?')">Delete</button>
+              </form>
+            </td>
+          <% } %>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
+
