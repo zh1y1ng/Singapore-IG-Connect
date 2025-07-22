@@ -265,6 +265,79 @@ app.post('/members/:id/delete', checkAuthentication, (req, res) => {
 
 // --- tengyang code ------------------------
 
+// --- pekwen code ------------------------
+
+// IG Galleries Routes
+app.get('/galleries', checkAuthentication, (req, res) => {
+    const search = req.query.search || '';
+    const query = `
+        SELECT * FROM galleries
+        WHERE caption LIKE ? OR upload_date LIKE ?
+        ORDER BY upload_date DESC
+    `;
+
+    db.query(query, [`%${search}%`, `%${search}%`], (err, results) => {
+        if (err) throw err;
+        res.render('galleries', {
+            user: req.session.user,
+            galleries: results,
+            search
+        });
+    });
+});
+
+// Admin only - Add new gallery item
+app.get('/galleries/new', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('gallery_form', { gallery: null });
+});
+
+
+app.post('/galleries', checkAuthentication, checkAdmin, (req, res) => {
+    const { ig_id, media_url, caption, upload_date } = req.body;
+    const sql = 'INSERT INTO galleries (ig_id, media_url, caption, upload_date) VALUES (?, ?, ?, ?)';
+    db.query(sql, [ig_id, media_url, caption, upload_date], (err, result) => {
+        if (err) throw err;
+        res.redirect('/galleries');
+    });
+});
+
+// Admin only - Edit gallery item
+app.get('/galleries/:id/edit', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    connection.query('SELECT * FROM galleries WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            res.status(500).send('Database error');
+        } else {
+            const gallery = results[0];
+            res.render('gallery_form', { gallery });
+        }
+    });
+});
+
+
+app.post('/galleries/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const { ig_id, media_url, caption, upload_date } = req.body;
+    const sql = 'UPDATE galleries SET ig_id = ?, media_url = ?, caption = ?, upload_date = ? WHERE id = ?';
+    db.query(sql, [ig_id, media_url, caption, upload_date, id], (err, result) => {
+        if (err) throw err;
+        res.redirect('/galleries');
+    });
+});
+
+// Admin only - Delete gallery item
+app.post('/galleries/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    db.query('DELETE FROM galleries WHERE id = ?', [id], (err, result) => {
+        if (err) throw err;
+        res.redirect('/galleries');
+    });
+});
+
+app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('admin', { user: req.session.user });
+});
+
 app.listen(3000, () => {
     console.log('Server running on http://localhost:3000');
 });
