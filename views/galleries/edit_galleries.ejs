@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+
+<!-- Background image -->
+<div 
+  class="bg-fullpage" 
+  style="background-image: url('/image/gallery_background.png');">
+</div>
+
+<!-- Main content -->
+<div class="container content-wrapper" style="max-width: 600px;">
+  <h2 class="mb-4">Edit Gallery Item</h2>
+
+  <form action="/galleries/<%= gallery.id %>" method="POST">
+    <div class="mb-3">
+      <label for="ig_id" class="form-label">Instagram Post ID</label>
+      <input
+        type="text"
+        class="form-control"
+        id="ig_id"
+        name="ig_id"
+        value="<%= gallery.ig_id %>"
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="media_url" class="form-label">Media URL</label>
+      <input
+        type="url"
+        class="form-control"
+        id="media_url"
+        name="media_url"
+        value="<%= gallery.media_url %>"
+        required
+      >
+    </div>
+
+    <div class="mb-3">
+      <label for="caption" class="form-label">Caption</label>
+      <textarea
+        class="form-control"
+        id="caption"
+        name="caption"
+        rows="3"
+        required
+      ><%= gallery.caption %></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="upload_date" class="form-label">Upload Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="upload_date"
+        name="upload_date"
+        value="<%= gallery.upload_date.toISOString().split('T')[0] %>"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-warning me-2">Update</button>
+    <a href="/galleries" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
