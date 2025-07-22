@@ -265,7 +265,7 @@ app.post('/members/:id/delete', checkAuthentication, (req, res) => {
 
 // --- tengyang code ---
 
-// --- pekwen code ------------------------
+// --- pekwen code 
 
 // IG Galleries Routes
 app.get('/galleries', checkAuthentication, (req, res) => {
