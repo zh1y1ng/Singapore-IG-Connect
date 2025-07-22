@@ -263,7 +263,7 @@ app.post('/members/:id/delete', checkAuthentication, (req, res) => {
     });
 });
 
-// --- tengyang code ------------------------
+// --- tengyang code ---
 
 // --- pekwen code ------------------------
 
