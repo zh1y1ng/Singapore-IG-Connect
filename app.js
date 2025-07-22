@@ -338,6 +338,63 @@ app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
     res.render('admin', { user: req.session.user });
 });
 
+// --- inarah ---------
+app.get('/students', checkAuthentication, (req, res) => {
+    const search = req.query.search || '';
+    const sql = `SELECT * FROM students WHERE name LIKE ? OR email LIKE ?`;
+    db.query(sql, [`%${search}%`, `%${search}%`], (err, results) => {
+        if (err) throw err;
+        res.render('students/index', { students: results, user: req.session.user });
+    });
+});
+
+app.get('/students/new', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('students/newstudent');
+});
+
+app.post('/students', checkAuthentication, checkAdmin, (req, res) => {
+    const { name, school_id, email, interests, profile_pic } = req.body;
+    const sql = `INSERT INTO students (name, school_id, email, interests, profile_pic) VALUES (?, ?, ?, ?, ?)`;
+    db.query(sql, [name, school_id, email, interests, profile_pic], (err) => {
+        if (err) throw err;
+        res.redirect('/students');
+    });
+});
+
+app.get('/students/edit/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const sql = `SELECT * FROM students WHERE id = ?`;
+    db.query(sql, [req.params.id], (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            req.flash('error', 'Student not found');
+            return res.redirect('/students');
+        }
+        res.render('students/editstudent', { student: result[0] });
+    });
+});
+
+app.post('/students/update/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const { name, school_id, email, interests, profile_pic } = req.body;
+    const sql = `UPDATE students SET name=?, school_id=?, email=?, interests=?, profile_pic=? WHERE id=?`;
+    db.query(sql, [name, school_id, email, interests, profile_pic, req.params.id], (err) => {
+        if (err) {
+            console.error('Update student error:', err);
+            req.flash('error', 'Failed to update student.');
+            return res.redirect('/students/edit/' + req.params.id);
+        }
+        res.redirect('/students');
+    });
+});
+
+
+
+app.post('/students/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
+    db.query('DELETE FROM students WHERE id = ?', [req.params.id], (err) => {
+        if (err) throw err;
+        res.redirect('/students');
+    });
+});
+
 app.listen(3000, () => {
     console.log('Server running on http://localhost:3000');
 });
