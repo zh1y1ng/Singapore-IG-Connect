@@ -1,0 +1,82 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center">Edit Student</h2>
+
+  <form method="POST" action="/students/update/<%= student.id %>">
+    <div class="mb-3">
+        <label for="name" class="form-label">Name:</label>
+        <input 
+            type="text" 
+            class="form-control" 
+            name="name" 
+            id="name" 
+            value="<%= student.name %>" 
+            required
+        >
+    </div>
+
+
+    <div class="mb-3">
+        <label for="school_id" class="form-label">School ID:</label>
+        <input 
+            type="number" 
+            class="form-control" 
+            name="school_id" 
+            id="school_id" 
+            value="<%= student.school_id %>" 
+            required
+        >
+    </div>
+
+
+    <div class="mb-3">
+        <label for="interests" class="form-label">Interests:</label>
+        <input 
+            type="text" 
+            class="form-control" 
+            name="interests" 
+            id="interests" 
+            value="<%= student.interests %>"
+        >
+    </div>
+
+
+    <div class="mb-3">
+    <label for="email" class="form-label">Email:</label>
+        <input 
+            type="email" 
+            class="form-control" 
+            name="email" 
+            id="email" 
+            value="<%= student.email %>" 
+            required
+        >
+    </div>
+
+
+    <div class="mb-3">
+        <label for="profile_pic" class="form-label">Profile Picture URL:</label>
+        <input 
+            type="text" 
+            class="form-control" 
+            name="profile_pic" 
+            id="profile_pic" 
+            value="<%= student.profile_pic %>"
+        >
+        <% if (student.profile_pic) { %>
+            <div class="mt-2">
+                <img src="<%= student.profile_pic %>" alt="Current Image" width="100">
+            </div>
+        <% } %>
+    </div>
+
+
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">Update Student</button>
+      <a href="/students" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
