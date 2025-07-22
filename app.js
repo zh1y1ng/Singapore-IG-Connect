@@ -6,15 +6,16 @@ const flash = require( 'connect-flash' );
 const app = express();
 app.set('view engine', 'ejs');
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
     host: 'e3-0eg.h.filess.io',
     port: 3307,
     user: 'SingaporeIGConnect_beautyfast',
     password: '8f7baaabd3341fffcf08865ea704a1e3d1766a29',
-    database: 'SingaporeIGConnect_beautyfast'
+    database: 'SingaporeIGConnect_beautyfast',
 });
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static('public'));
 
 app.use(session({
@@ -216,17 +217,6 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
 
 // --- shahideen code ---
 
-// Middleware
-function checkAuthentication(req, res, next) {
-    if (req.session.user) return next();
-    res.redirect('/login');
-}
-
-function checkAdmin(req, res, next) {
-    if (req.session.user && req.session.user.role === 'admin') return next();
-    res.status(403).send('Access denied. Admins only.');
-}
-
 // GET all or search members
 app.get('/members', checkAuthentication, (req, res) => {
     const keyword = req.query.keyword;
@@ -379,11 +369,6 @@ app.post('/galleries/:id/delete', checkAuthentication, checkAdmin, (req, res) =>
         res.redirect('/galleries');
     });
 });
-
-app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
-    res.render('admin', { user: req.session.user });
-});
-
 
 // --- inarah ---------
 app.get('/students', checkAuthentication, (req, res) => {
