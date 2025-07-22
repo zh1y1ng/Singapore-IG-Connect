@@ -134,6 +134,8 @@ app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
     res.render('admin', { user: req.session.user });
 });
 
+// --- zhiying code ---
+
 // --- View all schools (Both user & admin) ---
 app.get('/schools', checkAuthentication, (req, res) => {
     const query = 'SELECT * FROM schools';
