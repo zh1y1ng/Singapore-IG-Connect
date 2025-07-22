@@ -75,43 +75,47 @@
 <div class="container mt-5">
     <h2>All IG Members</h2>
 
-<form action="/members" method="get" class="mb-3">
+<form action="/interestgroups/search" method="get" class="mb-3">
     <div class="input-group">
-        <input type="text" name="keyword" value="<%= keyword || '' %>" placeholder="Search by student or IG" class="form-control" />
+        <input type="text" name="keyword" placeholder="Search by student or IG" class="form-control" />
         <button type="submit" class="btn btn-primary">Search</button>
     </div>
 </form>
 
 <% if (user && user.role === 'admin') { %>
-    <a href="/members/addmember" class="btn btn-success mb-3">Add New Member</a>
+    <a href="/interestgroups/add" class="btn btn-success mb-3">Add New Member</a>
 <% } %>
 
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>Student</th>
-            <th>Interest Group</th>
-            <th>Role</th>
-            <th>Joined Date</th>
-            <th>Action</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Meeting Schedule</th>
+            <% if (user && user.role === 'admin') { %>
+                <th>Action</th>
+            <% } %>
         </tr>
     </thead>
     <tbody>
-        <% members.forEach(member => { %>
+        <% interest_groups.forEach(interestgroups => { %>
             <tr>
-                <td><%= member.student_name %></td>
-                <td><%= member.ig_name %></td>
-                <td><%= member.role %></td>
-                <td><%= member.joined_date.toISOString().split('T')[0] %></td>
+                <td><%= interestgroups.name %></td>
+                <td><%= interestgroups.category %></td>
+                <td><%= interestgroups.description %></td>
+                <td><%= interestgroups.meeting_schedule %></td>
+                <% if (user && user.role === 'admin') { %>
                 <td>
-                    <% if (user && user.role === 'admin') { %>
-                        <a href="/members/edit/<%= member.id %>" class="btn btn-warning btn-sm me-1">Edit</a>
-                        <form action="/members/<%= member.id %>/delete" method="POST" style="display:inline;">
-                            <button class="btn btn-danger btn-sm">Delete</button>
-                        </form>
-                    <% } %>
+                    <a href="/interestgroups/<%= interestgroups.id %>/edit" class="btn btn-warning btn-sm me-1">Edit</a>
+                    <form action="/interestgroups/<%= interestgroups.id %>/delete" method="POST" style="display:inline;">
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
                 </td>
+                <% } %>
             </tr>
         <% }) %>
     </tbody>
 </table>
+</body>
+</html>

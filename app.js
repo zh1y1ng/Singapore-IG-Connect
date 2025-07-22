@@ -216,62 +216,51 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
 });
 
 // --- basil ---
-const { name } = require("ejs");
-
-function checkAuthentication(req, res, next) {
-    if (req.session.user) return next();
-    res.redirect('/login');
-}
-
-function checkAdmin(req, res, next) {
-    if (req.session.user && req.session.user.role === 'admin') return next();
-    res.status(403).send('Access denied. Admins only.');
-}
 
 // view and searchs IGs
-app.get('/ig', checkAuthentication, (req, res) => {
+app.get('/interestgroups', checkAuthentication, (req, res) => {
     const sql = 'SELECT * FROM interest_groups';
     db.query(sql, (err, results) => {
         if (err) throw err;
-        res.render('ig/index', { igs: results, user: req.session.user });
+        res.render('interestgroups/index', { interest_groups: results, user: req.session.user });
     });
 });
 
 // add new IG - Admin
-app.get('/ig/addIg', checkAuthentication, checkAdmin, (req, res) => {
-    res.render('ig/addIg'); // Make sure your file is views/ig/addIg.ejs
+app.get('/interestgroups/add', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('interestgroups/add'); // Make sure your file is views/ig/addIg.ejs
 });
 
-app.post('/ig', checkAuthentication, checkAdmin, (req, res) => {
+app.post('/interestgroups', checkAuthentication, checkAdmin, (req, res) => {
     const { name, category, description } = req.body;
     const sql = 'INSERT INTO interest_groups (name, category, description) VALUES (?, ?, ?)';
     db.query(sql, [name, category, description], (err) => {
         if (err) throw err;
-        res.redirect('/ig');
+        res.redirect('/interestgroups');
     });
 });
 
 
 // edit IG details - Admin
-app.get('/ig/:id/edit', checkAuthentication, checkAdmin, (req, res) => {
+app.get('/interestgroups/:id/edit', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
     db.query('SELECT * FROM interest_groups WHERE id = ?', [id], (err, results) => {
         if (err) {
             res.status(500).send('Database error');
         } else {
             const ig = results[0];
-            res.render('ig/edit', { ig });
+            res.render('interestgroups/edit', { ig });
         }
     });
 });
 
-app.post('/ig/:id', checkAuthentication, checkAdmin, (req, res) => {
+app.post('/interestgroups/:id', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
     const { name, category, description } = req.body;
     const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ? WHERE id = ?';
     db.query(sql, [name, category, description, id], (err) => {
         if (err) throw err;
-        res.redirect('/ig');
+        res.redirect('/interestgroups');
     });
 });
 
@@ -376,7 +365,7 @@ app.post('/members/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
 app.get('/events', checkAuthentication, (req, res) => {
     db.query('SELECT * FROM events', (error, results) => {
         if (error) return res.status(500).send('Error retrieving events');
-        res.render('events', { events: results, user: req.session.user });
+        res.render('events/events', { events: results, user: req.session.user });
     });
 });
 
@@ -413,7 +402,7 @@ app.get('/addEvent', checkAuthentication, (req, res) => {
     res.render('addEvent', { user: req.session.user });
 });
 
-app.post('/addEvent', (req, res) => {
+app.post('/addEvent', checkAuthentication, (req, res) => {
     const { name, date, location, description } = req.body;
     db.query(
         'INSERT INTO events (name, date, location, description) VALUES (?, ?, ?, ?)',
@@ -425,14 +414,14 @@ app.post('/addEvent', (req, res) => {
     );
 });
 
-app.get('/editEvent/:id', (req, res) => {
+app.get('/editEvent/:id', checkAuthentication, (req, res) => {
     db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
         if (error) return res.status(500).send('Error retrieving event');
         res.render('editEvent', { event: results[0], user: req.session.user });
     });
 });
 
-app.post('/editEvent/:id', (req, res) => {
+app.post('/editEvent/:id', checkAuthentication, (req, res) => {
     const { name, date, location, description } = req.body;
 
     const sql = 'UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?';
@@ -449,7 +438,7 @@ app.post('/editEvent/:id', (req, res) => {
 
 
 
-app.get('/deleteEvent/:id', (req, res) => {
+app.get('/deleteEvent/:id', checkAuthentication, (req, res) => {
     db.query('DELETE FROM events WHERE id = ?', [req.params.id], (error) => {
         if (error) return res.status(500).send('Error deleting event');
         res.redirect('/events');
