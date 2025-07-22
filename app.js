@@ -288,9 +288,8 @@ app.get('/galleries', checkAuthentication, (req, res) => {
 
 // Admin only - Add new gallery item
 app.get('/galleries/new', checkAuthentication, checkAdmin, (req, res) => {
-    res.render('gallery_form', { gallery: null });
+    res.render('galleries/gallery_form', { gallery: null });
 });
-
 
 app.post('/galleries', checkAuthentication, checkAdmin, (req, res) => {
     const { ig_id, media_url, caption, upload_date } = req.body;
@@ -304,16 +303,15 @@ app.post('/galleries', checkAuthentication, checkAdmin, (req, res) => {
 // Admin only - Edit gallery item
 app.get('/galleries/:id/edit', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
-    connection.query('SELECT * FROM galleries WHERE id = ?', [id], (err, results) => {
+    db.query('SELECT * FROM galleries WHERE id = ?', [id], (err, results) => {
         if (err) {
             res.status(500).send('Database error');
         } else {
             const gallery = results[0];
-            res.render('gallery_form', { gallery });
+            res.render('galleries/gallery_form', { gallery });
         }
     });
 });
-
 
 app.post('/galleries/:id', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
@@ -337,6 +335,7 @@ app.post('/galleries/:id/delete', checkAuthentication, checkAdmin, (req, res) =>
 app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
     res.render('admin', { user: req.session.user });
 });
+
 
 // --- inarah ---------
 app.get('/students', checkAuthentication, (req, res) => {
@@ -393,6 +392,17 @@ app.post('/students/delete/:id', checkAuthentication, checkAdmin, (req, res) => 
         if (err) throw err;
         res.redirect('/students');
     });
+});
+
+
+// About Us page
+app.get('/aboutus', (req, res) => {
+  res.render('about');
+});
+
+// Contact Us page
+app.get('/contactus', (req, res) => {
+  res.render('contact');
 });
 
 app.listen(3000, () => {
