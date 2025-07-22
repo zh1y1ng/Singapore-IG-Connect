@@ -266,7 +266,7 @@ app.post('/interestgroups/:id', checkAuthentication, checkAdmin, (req, res) => {
 
 
 // delete IG - Admin
-app.post('/ig/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
+app.post('/interestgroups/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
     const sql = 'DELETE FROM interest_groups WHERE id = ?';
     db.query(sql, [req.params.id], (err) => {
         if (err) throw err;
