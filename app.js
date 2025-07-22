@@ -213,6 +213,58 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
 });
 
 
+
+// --- shahideen code ---
+
+// GET all members
+app.get('/members', checkAuthentication, (req, res) => {
+    const sql = `
+        SELECT members.id, students.name AS student_name, interest_groups.name AS ig_name, role, joined_date
+        FROM members
+        JOIN students ON members.student_id = students.id
+        JOIN interest_groups ON members.ig_id = interest_groups.id
+    `;
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.render('members/index', { members: results });
+    });
+});
+
+// GET form to add member
+app.get('/members/addmember', checkAuthentication, (req, res) => {
+    const fetchStudents = 'SELECT id, name FROM students';
+    const fetchIGs = 'SELECT id, name FROM interest_groups';
+    
+    db.query(fetchStudents, (err, students) => {
+        if (err) throw err;
+        db.query(fetchIGs, (err, igs) => {
+            if (err) throw err;
+            res.render('members/addmember', { students, igs });
+        });
+    });
+});
+
+// POST new member
+app.post('/members', checkAuthentication, (req, res) => {
+    const { student_id, ig_id, role, joined_date } = req.body;
+    const sql = 'INSERT INTO members (student_id, ig_id, role, joined_date) VALUES (?, ?, ?, ?)';
+    db.query(sql, [student_id, ig_id, role, joined_date], (err) => {
+        if (err) throw err;
+        res.redirect('/members');
+    });
+});
+
+// DELETE member
+app.post('/members/:id/delete', checkAuthentication, (req, res) => {
+    const sql = 'DELETE FROM members WHERE id = ?';
+    db.query(sql, [req.params.id], (err) => {
+        if (err) throw err;
+        res.redirect('/members');
+    });
+});
+
+
+
 app.listen(3000, () => {
     console.log('Server running on http://localhost:3000');
 });
