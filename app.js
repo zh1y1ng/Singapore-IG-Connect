@@ -278,7 +278,7 @@ app.get('/galleries', checkAuthentication, (req, res) => {
 
     db.query(query, [`%${search}%`, `%${search}%`], (err, results) => {
         if (err) throw err;
-        res.render('galleries', {
+        res.render('galleries/galleries', {
             user: req.session.user,
             galleries: results,
             search
