@@ -215,7 +215,75 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
     });
 });
 
+// --- basil ---
+const { name } = require("ejs");
 
+function checkAuthentication(req, res, next) {
+    if (req.session.user) return next();
+    res.redirect('/login');
+}
+
+function checkAdmin(req, res, next) {
+    if (req.session.user && req.session.user.role === 'admin') return next();
+    res.status(403).send('Access denied. Admins only.');
+}
+
+// view and searchs IGs
+app.get('/ig', checkAuthentication, (req, res) => {
+    const sql = 'SELECT * FROM interest_groups';
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.render('ig/index', { igs: results, user: req.session.user });
+    });
+});
+
+// add new IG - Admin
+app.get('/ig/addIg', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('ig/addIg'); // Make sure your file is views/ig/addIg.ejs
+});
+
+app.post('/ig', checkAuthentication, checkAdmin, (req, res) => {
+    const { name, category, description } = req.body;
+    const sql = 'INSERT INTO interest_groups (name, category, description) VALUES (?, ?, ?)';
+    db.query(sql, [name, category, description], (err) => {
+        if (err) throw err;
+        res.redirect('/ig');
+    });
+});
+
+
+// edit IG details - Admin
+app.get('/ig/:id/edit', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    db.query('SELECT * FROM interest_groups WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            res.status(500).send('Database error');
+        } else {
+            const ig = results[0];
+            res.render('ig/edit', { ig });
+        }
+    });
+});
+
+app.post('/ig/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const { name, category, description } = req.body;
+    const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ? WHERE id = ?';
+    db.query(sql, [name, category, description, id], (err) => {
+        if (err) throw err;
+        res.redirect('/ig');
+    });
+});
+
+
+// delete IG - Admin
+app.post('/ig/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
+    const sql = 'DELETE FROM interest_groups WHERE id = ?';
+    db.query(sql, [req.params.id], (err) => {
+        if (err) throw err;
+        res.redirect('/ig');
+    });
+});
 
 // --- shahideen code ---
 
