@@ -303,6 +303,89 @@ app.post('/members/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
 
 // --- tengyang code -----
 
+app.get('/events', checkAuthentication, (req, res) => {
+    db.query('SELECT * FROM events', (error, results) => {
+        if (error) return res.status(500).send('Error retrieving events');
+        res.render('events', { events: results, user: req.session.user });
+    });
+});
+
+
+
+app.get('/events/new', checkAuthentication, (req, res) => {
+    const sql = 'SELECT * FROM events';  // Adjust table name if different
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Database error');
+        }
+
+        res.render('events/new', {
+            user: req.session.user,
+            events: results  // pass the events array to the view
+        });
+    });
+});
+
+
+app.get('/events/:id', (req, res) => {
+    db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
+        if (error) return res.status(500).send('Error retrieving event');
+        if (results.length > 0) {
+            res.render('events/details', { event: results[0], user: req.session.user });
+        } else {
+            res.status(404).send('Event not found');
+        }
+    });
+});
+
+app.get('/addEvent', checkAuthentication, (req, res) => {
+    res.render('addEvent', { user: req.session.user });
+});
+
+app.post('/addEvent', (req, res) => {
+    const { name, date, location, description } = req.body;
+    db.query(
+        'INSERT INTO events (name, date, location, description) VALUES (?, ?, ?, ?)',
+        [name, date, location, description],
+        (error) => {
+            if (error) return res.status(500).send('Error adding event');
+            res.redirect('/events');
+        }
+    );
+});
+
+app.get('/editEvent/:id', (req, res) => {
+    db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
+        if (error) return res.status(500).send('Error retrieving event');
+        res.render('editEvent', { event: results[0], user: req.session.user });
+    });
+});
+
+app.post('/editEvent/:id', (req, res) => {
+    const { name, date, location, description } = req.body;
+
+    const sql = 'UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?';
+    const values = [name, date, location, description, req.params.id];
+
+    db.query(sql, values, (error) => {
+        if (error) {
+            console.error('MySQL error:', error);
+            return res.status(500).send('Error updating event');
+        }
+        res.redirect('/events');
+    });
+});
+
+
+
+app.get('/deleteEvent/:id', (req, res) => {
+    db.query('DELETE FROM events WHERE id = ?', [req.params.id], (error) => {
+        if (error) return res.status(500).send('Error deleting event');
+        res.redirect('/events');
+    });
+});
+
 // --- pekwen code ------------------------
 
 // IG Galleries Routes
@@ -437,91 +520,6 @@ app.get('/aboutus', (req, res) => {
 app.get('/contactus', (req, res) => {
   res.render('contact');
 });
-
-app.get('/events', checkAuthentication, (req, res) => {
-    db.query('SELECT * FROM events', (error, results) => {
-        if (error) return res.status(500).send('Error retrieving events');
-        res.render('events', { events: results, user: req.session.user });
-    });
-});
-
-
-
-app.get('/events/new', checkAuthentication, (req, res) => {
-    const sql = 'SELECT * FROM events';  // Adjust table name if different
-    db.query(sql, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send('Database error');
-        }
-
-        res.render('events/new', {
-            user: req.session.user,
-            events: results  // pass the events array to the view
-        });
-    });
-});
-
-
-app.get('/events/:id', (req, res) => {
-    db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
-        if (error) return res.status(500).send('Error retrieving event');
-        if (results.length > 0) {
-            res.render('events/details', { event: results[0], user: req.session.user });
-        } else {
-            res.status(404).send('Event not found');
-        }
-    });
-});
-
-app.get('/addEvent', checkAuthentication, (req, res) => {
-    res.render('addEvent', { user: req.session.user });
-});
-
-app.post('/addEvent', (req, res) => {
-    const { name, date, location, description } = req.body;
-    db.query(
-        'INSERT INTO events (name, date, location, description) VALUES (?, ?, ?, ?)',
-        [name, date, location, description],
-        (error) => {
-            if (error) return res.status(500).send('Error adding event');
-            res.redirect('/events');
-        }
-    );
-});
-
-app.get('/editEvent/:id', (req, res) => {
-    db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
-        if (error) return res.status(500).send('Error retrieving event');
-        res.render('editEvent', { event: results[0], user: req.session.user });
-    });
-});
-
-app.post('/editEvent/:id', (req, res) => {
-    const { name, date, location, description } = req.body;
-
-    const sql = 'UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?';
-    const values = [name, date, location, description, req.params.id];
-
-    db.query(sql, values, (error) => {
-        if (error) {
-            console.error('MySQL error:', error);
-            return res.status(500).send('Error updating event');
-        }
-        res.redirect('/events');
-    });
-});
-
-
-
-app.get('/deleteEvent/:id', (req, res) => {
-    db.query('DELETE FROM events WHERE id = ?', [req.params.id], (error) => {
-        if (error) return res.status(500).send('Error deleting event');
-        res.redirect('/events');
-    });
-});
-
-
 
 
 app.listen(3000, () => {
