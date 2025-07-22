@@ -216,36 +216,56 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
 
 // --- shahideen code ---
 
-// GET all members
+// Middleware
+function checkAuthentication(req, res, next) {
+    if (req.session.user) return next();
+    res.redirect('/login');
+}
+
+function checkAdmin(req, res, next) {
+    if (req.session.user && req.session.user.role === 'admin') return next();
+    res.status(403).send('Access denied. Admins only.');
+}
+
+// GET all or search members
 app.get('/members', checkAuthentication, (req, res) => {
-    const sql = `
+    const keyword = req.query.keyword;
+    let sql = `
         SELECT members.id, students.name AS student_name, interest_groups.name AS ig_name, role, joined_date
         FROM members
         JOIN students ON members.student_id = students.id
         JOIN interest_groups ON members.ig_id = interest_groups.id
     `;
-    db.query(sql, (err, results) => {
+    const params = [];
+
+    if (keyword) {
+        sql += ` WHERE students.name LIKE ? OR interest_groups.name LIKE ?`;
+        const searchTerm = `%${keyword}%`;
+        params.push(searchTerm, searchTerm);
+    }
+
+    db.query(sql, params, (err, results) => {
         if (err) throw err;
-        res.render('members/index', { members: results });
+        res.render('members/index', { members: results, keyword, user: req.session.user });
     });
 });
 
-// GET form to add member
-app.get('/members/addmember', checkAuthentication, (req, res) => {
+// GET form to add member (admin only)
+app.get('/members/addmember', checkAuthentication, checkAdmin, (req, res) => {
     const fetchStudents = 'SELECT id, name FROM students';
     const fetchIGs = 'SELECT id, name FROM interest_groups';
-    
+
     db.query(fetchStudents, (err, students) => {
         if (err) throw err;
         db.query(fetchIGs, (err, igs) => {
             if (err) throw err;
-            res.render('members/addmember', { students, igs });
+            res.render('members/addmember', { students, igs, user: req.session.user });
         });
     });
 });
 
-// POST new member
-app.post('/members', checkAuthentication, (req, res) => {
+// POST add member (admin only)
+app.post('/members', checkAuthentication, checkAdmin, (req, res) => {
     const { student_id, ig_id, role, joined_date } = req.body;
     const sql = 'INSERT INTO members (student_id, ig_id, role, joined_date) VALUES (?, ?, ?, ?)';
     db.query(sql, [student_id, ig_id, role, joined_date], (err) => {
@@ -254,8 +274,36 @@ app.post('/members', checkAuthentication, (req, res) => {
     });
 });
 
-// DELETE member
-app.post('/members/:id/delete', checkAuthentication, (req, res) => {
+// GET edit form (admin only)
+app.get('/members/edit/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const memberId = req.params.id;
+    const sql = `
+        SELECT members.*, students.name AS student_name, interest_groups.name AS ig_name
+        FROM members
+        JOIN students ON members.student_id = students.id
+        JOIN interest_groups ON members.ig_id = interest_groups.id
+        WHERE members.id = ?
+    `;
+    db.query(sql, [memberId], (err, results) => {
+        if (err) throw err;
+        if (results.length === 0) return res.status(404).send('Member not found');
+        res.render('members/editmember', { member: results[0], user: req.session.user });
+    });
+});
+
+// POST update member role (admin only)
+app.post('/members/edit/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const memberId = req.params.id;
+    const { role } = req.body;
+    const sql = 'UPDATE members SET role = ? WHERE id = ?';
+    db.query(sql, [role, memberId], (err) => {
+        if (err) throw err;
+        res.redirect('/members');
+    });
+});
+
+// DELETE member (admin only)
+app.post('/members/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
     const sql = 'DELETE FROM members WHERE id = ?';
     db.query(sql, [req.params.id], (err) => {
         if (err) throw err;
