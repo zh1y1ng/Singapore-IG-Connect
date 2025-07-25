@@ -361,13 +361,13 @@ app.post('/members/:id/delete', checkAuthentication, checkAdmin, (req, res) => {
 });
 
 // --- tengyang code -----
-
 app.get('/events', checkAuthentication, (req, res) => {
-    db.query('SELECT * FROM events', (error, results) => {
+    db.query('SELECT * FROM events ORDER BY date ASC', (error, results) => {
         if (error) return res.status(500).send('Error retrieving events');
-        res.render('events/events', { events: results, user: req.session.user });
+        res.render('events', { events: results, user: req.session.user });
     });
 });
+
 
 
 
@@ -402,7 +402,7 @@ app.get('/addEvent', checkAuthentication, (req, res) => {
     res.render('addEvent', { user: req.session.user });
 });
 
-app.post('/addEvent', checkAuthentication, (req, res) => {
+app.post('/addEvent', (req, res) => {
     const { name, date, location, description } = req.body;
     db.query(
         'INSERT INTO events (name, date, location, description) VALUES (?, ?, ?, ?)',
@@ -414,14 +414,28 @@ app.post('/addEvent', checkAuthentication, (req, res) => {
     );
 });
 
-app.get('/editEvent/:id', checkAuthentication, (req, res) => {
+app.get('/editEvent/:id', (req, res) => {
     db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
         if (error) return res.status(500).send('Error retrieving event');
-        res.render('editEvent', { event: results[0], user: req.session.user });
+
+        if (results.length === 0) {
+            return res.status(404).send('Event not found');
+        }
+
+        const event = results[0];
+
+        // ✅ Format the date to "YYYY-MM-DD" for the <input type="date"> to work
+        const formattedDate = new Date(event.date).toISOString().split('T')[0];
+
+        // ✅ Add new key to event object
+        event.formattedDate = formattedDate;
+
+        res.render('editEvent', { event: event, user: req.session.user });
     });
 });
 
-app.post('/editEvent/:id', checkAuthentication, (req, res) => {
+
+app.post('/editEvent/:id', (req, res) => {
     const { name, date, location, description } = req.body;
 
     const sql = 'UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?';
@@ -438,12 +452,62 @@ app.post('/editEvent/:id', checkAuthentication, (req, res) => {
 
 
 
-app.get('/deleteEvent/:id', checkAuthentication, (req, res) => {
+app.get('/deleteEvent/:id', (req, res) => {
     db.query('DELETE FROM events WHERE id = ?', [req.params.id], (error) => {
         if (error) return res.status(500).send('Error deleting event');
         res.redirect('/events');
     });
 });
+
+// day 2 updated codes
+app.get('/eventname/:id', (req, res) => {
+    const eventId = req.params.id;
+
+    db.query('SELECT * FROM events WHERE id = ?', [eventId], (error, results) => {
+        if (error) {
+            return res.status(500).send('Database error');
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send('Event not found');
+        }
+
+        const event = results[0];
+        res.render('eventname', { event: event }); // this matches your eventname.ejs
+    });
+});
+
+
+app.get('/search-events', (req, res) => {
+    const search = req.query.query;
+    const keyword = "%" + search + "%";
+
+    const sql = "SELECT * FROM events WHERE name LIKE ? OR location LIKE ?";
+    db.query(sql, [keyword, keyword], (err, results) => {
+        if (err) {
+            return res.send("Database error: " + err.message);
+        }
+
+        res.render("events", {
+            events: results,
+            user: req.session.user, // adjust if you use something else
+            searchTerm: search
+        });
+    });
+});
+
+app.get('/aboutus', (req, res) => {
+    res.render('aboutus', { user: req.session.user, messages: req.flash('success') });
+});
+
+
+
+app.get('/contactus', (req, res) => {
+    res.render('contactus', { user: req.session.user, messages: req.flash('success') });
+});
+
+
+
 
 // --- pekwen code ------------------------
 
