@@ -135,11 +135,11 @@
 
     <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
         <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
-        <a href="/IGmembers" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
-        <a href="/IGevents" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
         <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
-        <a href="/studentprofiles" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
-        <a href="/IGgalleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
     </div>
 
   </div>
@@ -168,7 +168,7 @@
         <h5 class="card-title">Interest Groups</h5>
         <a href="/interestgroups" class="btn btn-primary btn-sm">View</a>
         <% if (user.role === 'admin') { %>
-        <a href="/interest-groups/new" class="btn btn-success btn-sm">Add</a>
+        <a href="/interestgroups/add" class="btn btn-success btn-sm">Add</a>
         <% } %>
       </div>
     </div>
@@ -179,7 +179,7 @@
         <h5 class="card-title">IG Members</h5>
         <a href="/members" class="btn btn-primary btn-sm">View</a>
         <% if (user.role === 'admin') { %>
-        <a href="/members/new" class="btn btn-success btn-sm">Add</a>
+        <a href="/members/addmember" class="btn btn-success btn-sm">Add</a>
         <% } %>
       </div>
     </div>
@@ -201,7 +201,7 @@
         <h5 class="card-title">School Directory</h5>
         <a href="/schools" class="btn btn-primary btn-sm">View</a>
         <% if (user.role === 'admin') { %>
-        <a href="/schools/new" class="btn btn-success btn-sm">Add</a>
+        <a href="/schools/addSchool" class="btn btn-success btn-sm">Add</a>
         <% } %>
       </div>
     </div>

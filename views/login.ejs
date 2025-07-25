@@ -58,13 +58,23 @@
         form label {
             font-weight: bold;
         }
+
+        .back-arrow {
+            font-size: 24px;
+            line-height: 1;
+            margin-top: -8px; /* Adjust if needed to align */
+            padding: 4px 10px;
+}
 </style>
 <body>
     <div class="d-flex justify-content-center align-items-center min-vh-100">
-        <div class="text-center" style="width:100%; max-width: 400px;">
+        <div class="text-center" style="width:100%; max-width: 400px; margin-top: -100px;">
 
-            <h2>Login</h2>
-            <br>
+        <div class="d-flex justify-content-center align-items-center mb-4" style="gap: 12px;">
+        <a href="/" class="btn btn-outline-secondary btn-sm d-flex align-items-center justify-content-center" style=" margin-left: -50px; font-size: 22px; height: 25px; width: 40px; padding: 0;">&#8592;</a>
+        <h2 class="mb-0" style="font-size: 70px; margin-top: 0;">Login</h2>
+        </div>
+
 
             <% if (messages && messages.length > 0) { %>
                 <div class="success-message-box mx-auto text-center">
