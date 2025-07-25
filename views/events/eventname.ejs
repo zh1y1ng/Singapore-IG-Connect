@@ -42,24 +42,33 @@
 
 <body>
   <!-- Fixed Navbar -->
-  <nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <div style="flex: 1; text-align: left;">
-        <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
-          Singapore IG Connect
-        </a>
-      </div>
+ <nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
 
-      <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
-        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
-        <a href="/IGmembers" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
-        <a href="/IGevents" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
-        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
-        <a href="/studentprofiles" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
-        <a href="/IGgalleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
-      </div>
+    <style>
+    nav a:hover {
+      text-decoration: underline !important;
+    }
+    </style>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="flex: 1; text-align: left;">
+      <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
+        Singapore IG Connect
+      </a>
     </div>
-  </nav>
+
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
+        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
+        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+    </div>
+
+  </div>
+</nav>
 
   <!-- Main Content -->
   <div class="container" style="padding-top: 110px;">

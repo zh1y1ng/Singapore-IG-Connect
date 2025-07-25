@@ -143,7 +143,8 @@ app.get('/schools', checkAuthentication, (req, res) => {
         if (err) throw err;
         res.render('schools/index', {
             schools: results,
-            user: req.session.user
+            user: req.session.user,
+            searchTerm: ' '
         });
     });
 });
@@ -151,15 +152,17 @@ app.get('/schools', checkAuthentication, (req, res) => {
 // --- Search school by name/location (Both user & admin) ---
 app.get('/schools/search', checkAuthentication, (req, res) => {
     const keyword = req.query.keyword;
-    const query = `
-        SELECT * FROM schools 
-        WHERE name LIKE ? OR address LIKE ?
-    `;
-    db.query(query, [`%${keyword}%`, `%${keyword}%`], (err, results) => {
-        if (err) throw err;
-        res.render('schools/index', {
+    const sql = 'SELECT * FROM schools WHERE name LIKE ? OR address LIKE ?';
+    const searchTerm = '%' + keyword + '%';
+
+    db.query(sql, [searchTerm, searchTerm], (err, results) => {
+        if (err) {
+            return res.status(500).send('Database error');
+        }
+        res.render('schools', {
             schools: results,
-            user: req.session.user
+            user: req.session.user,
+            searchTerm: keyword  // <-- send back to EJS
         });
     });
 });
@@ -414,7 +417,7 @@ app.post('/addEvent', (req, res) => {
     );
 });
 
-app.get('/editEvent/:id', (req, res) => {
+app.get('/events/edit/:id', (req, res) => {
     db.query('SELECT * FROM events WHERE id = ?', [req.params.id], (error, results) => {
         if (error) return res.status(500).send('Error retrieving event');
 
@@ -430,12 +433,12 @@ app.get('/editEvent/:id', (req, res) => {
         // ✅ Add new key to event object
         event.formattedDate = formattedDate;
 
-        res.render('editEvent', { event: event, user: req.session.user });
+        res.render('events/edit', { event: event, user: req.session.user });
     });
 });
 
 
-app.post('/editEvent/:id', (req, res) => {
+app.post('/events/update/:id', (req, res) => {
     const { name, date, location, description } = req.body;
 
     const sql = 'UPDATE events SET name = ?, date = ?, location = ?, description = ? WHERE id = ?';
@@ -460,7 +463,7 @@ app.get('/deleteEvent/:id', (req, res) => {
 });
 
 // day 2 updated codes
-app.get('/eventname/:id', (req, res) => {
+app.get('/events/eventname/:id', (req, res) => {
     const eventId = req.params.id;
 
     db.query('SELECT * FROM events WHERE id = ?', [eventId], (error, results) => {
@@ -473,7 +476,7 @@ app.get('/eventname/:id', (req, res) => {
         }
 
         const event = results[0];
-        res.render('eventname', { event: event }); // this matches your eventname.ejs
+        res.render('events/eventname', { event: event }); // this matches your eventname.ejs
     });
 });
 

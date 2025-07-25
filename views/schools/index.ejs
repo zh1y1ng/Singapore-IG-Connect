@@ -68,11 +68,11 @@
 
     <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
         <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
-        <a href="/IGmembers" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
-        <a href="/IGevents" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
         <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
-        <a href="/studentprofiles" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
-        <a href="/IGgalleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
     </div>
 
   </div>
@@ -83,10 +83,14 @@
 
   <form action="/schools/search" method="get" class="mb-3">
     <div class="input-group">
-    <input type="text" name="keyword" placeholder="Search by name or location" class="form-control" />
-    <button type="submit" class="btn btn-primary">Search</button>
+      <input type="text" name="keyword" placeholder="Search by name or location" class="form-control" value="<%= searchTerm %>" />
+      <button type="submit" class="btn btn-primary">Search</button>
     </div>
   </form>
+  
+  <% if (searchTerm && searchTerm.trim() !== '') { %>
+    <p class="text-center">Showing results for "<%= searchTerm %>"</p>
+  <% } %>
 
   <% if (user.role === 'admin') { %>
     <a href="/schools/addSchool" class="btn btn-success mb-3" >Add New School</a>

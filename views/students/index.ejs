@@ -1,5 +1,52 @@
 <%- include('../partials/header') %>
 
+<style>
+  h2 {
+    font-family: 'Montserrat';
+    font-weight: bold;
+    font-size: 50px;
+    padding-top: 45px;
+  }
+
+  body{
+    background-image: url('/image/schools_background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+  }
+</style>
+
+<body>
+
+<nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
+
+    <style>
+    nav a:hover {
+      text-decoration: underline !important;
+    }
+    </style>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="flex: 1; text-align: left;">
+      <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
+        Singapore IG Connect
+      </a>
+    </div>
+
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
+        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
+        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+    </div>
+
+  </div>
+</nav>
+
 <div class="container mt-5">
   <h2 class="text-center mb-4">Student Profiles</h2>
 
@@ -73,5 +120,6 @@
     </tbody>
   </table>
 </div>
+</body>
 
 <%- include('../partials/footer') %>
