@@ -46,6 +46,15 @@
   a.btn {
     font-family: 'Quicksand', sans-serif;
   }
+  
+  a.school-link {
+    text-decoration: none;
+    color: #000; /* optional: keeps the text black */
+  }
+
+  a.school-link:hover {
+    text-decoration: underline;
+  }
 </style>
 
 <body>
@@ -112,7 +121,9 @@
       <% schools.forEach(school => { %>
         <tr>
           <td class="text-center align-middle"><img src="<%= school.logo_url %>" width="80" /></td>
-          <td class="text-center align-middle"><%= school.name %></td>
+          <td class="text-center align-middle">
+            <a href="/schools/schoolEvents/<%= school.id %>" class="school-link"><%= school.name %></a>
+          </td>
           <td class="text-center align-middle"><%= school.address %></td>
           <td class="text-center align-middle"><%= school.contact_email %></td>
           <% if (user.role === 'admin') { %>
@@ -127,6 +138,11 @@
       <% }); %>
     </tbody>
   </table>
+
+  <div style="text-align: center;">
+    <a href="/dashboard" class="btn btn-secondary mt-3" style="font-family: 'Quicksand', sans-serif;">Back to Home</a>
+  </div>
+
 </div>
 </body>
 </html>

@@ -4,6 +4,7 @@ const session = require( 'express-session');
 const flash = require( 'connect-flash' );
 
 const app = express();
+const schoolEventsData = {};
 app.set('view engine', 'ejs');
 
 const db = mysql.createPool({
@@ -144,7 +145,7 @@ app.get('/schools', checkAuthentication, (req, res) => {
         res.render('schools/index', {
             schools: results,
             user: req.session.user,
-            searchTerm: ' '
+            searchTerm: ''
         });
     });
 });
@@ -216,6 +217,117 @@ app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
         if (err) throw err;
         res.redirect('/schools');
     });
+});
+
+app.get('/schools/schoolEvents/:id', checkAuthentication, (req, res) => {
+    const schoolId = req.params.id;
+
+    const schoolQuery = 'SELECT * FROM schools WHERE id = ?';
+    db.query(schoolQuery, [schoolId], (err, schoolResults) => {
+        if (err) return res.status(500).send('Error retrieving school');
+        if (schoolResults.length === 0) return res.status(404).send('School not found');
+
+        const school = schoolResults[0];
+
+        const events = schoolEventsData[schoolId] || [];
+
+        res.render('schools/schoolEvents', {
+            school: school,
+            events: events,
+            messages: req.flash('success'),
+            errors: req.flash('error'),
+            formData: {},
+            user: req.session.user 
+        });
+
+    });
+});
+
+app.post('/schools/schoolEvents/:id/add', checkAuthentication, (req, res) => {
+    const schoolId = req.params.id;
+    const { name, date, location, description } = req.body;
+
+    if (!name || !date || !location || !description) {
+        req.flash('error', 'All fields are required.');
+        req.flash('formData', req.body);
+        return res.redirect('/schools/schoolEvents/' + schoolId);
+    }
+
+    const newEvent = { name: name, date: date, location: location, description: description };
+
+    if (!schoolEventsData[schoolId]) {
+        schoolEventsData[schoolId] = [];
+    }
+
+    schoolEventsData[schoolId].push(newEvent);
+
+    req.flash('success', 'Event added successfully!');
+    res.redirect('/schools/schoolEvents/' + schoolId);
+});
+
+// Show Edit Event Form (Admin only)
+app.get('/schools/schoolEvents/:schoolId/edit/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
+    const schoolId = req.params.schoolId;
+    const eventIndex = parseInt(req.params.eventIndex);
+
+    const schoolQuery = 'SELECT * FROM schools WHERE id = ?';
+    db.query(schoolQuery, [schoolId], (err, schoolResults) => {
+        if (err) return res.status(500).send('Error retrieving school');
+        if (schoolResults.length === 0) return res.status(404).send('School not found');
+
+        const school = schoolResults[0];
+        const events = schoolEventsData[schoolId] || [];
+
+        if (eventIndex < 0 || eventIndex >= events.length) {
+            return res.status(404).send('Event not found');
+        }
+
+        const event = events[eventIndex];
+
+        res.render('schools/editschoolEvents', {
+            school: school,
+            event: event,
+            eventIndex: eventIndex,
+            errors: req.flash('error'),
+            user: req.session.user
+        });
+    });
+});
+
+// Handle Edit Event POST (Admin only)
+app.post('/schools/schoolEvents/:schoolId/edit/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
+    const schoolId = req.params.schoolId;
+    const eventIndex = parseInt(req.params.eventIndex);
+    const { name, date, location, description } = req.body;
+
+    if (!name || !date || !location || !description) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect(`/schools/schoolEvents/${schoolId}/edit/${eventIndex}`);
+    }
+
+    if (!schoolEventsData[schoolId] || eventIndex < 0 || eventIndex >= schoolEventsData[schoolId].length) {
+        return res.status(404).send('Event not found');
+    }
+
+    schoolEventsData[schoolId][eventIndex] = { name, date, location, description };
+
+    req.flash('success', 'Event updated successfully!');
+    res.redirect(`/schools/schoolEvents/${schoolId}`);
+});
+
+// Handle Delete Event (Admin only)
+app.post('/schools/schoolEvents/:schoolId/delete/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
+    const schoolId = req.params.schoolId;
+    const eventIndex = parseInt(req.params.eventIndex);
+
+    if (!schoolEventsData[schoolId] || eventIndex < 0 || eventIndex >= schoolEventsData[schoolId].length) {
+        return res.status(404).send('Event not found');
+    }
+
+    schoolEventsData[schoolId].splice(eventIndex, 1);
+
+    req.flash('success', 'Event deleted successfully!');
+    res.redirect(`/schools/schoolEvents/${schoolId}`);
 });
 
 // --- basil ---
