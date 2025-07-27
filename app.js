@@ -697,7 +697,7 @@ app.get('/students', checkAuthentication, (req, res) => {
     const sql = `SELECT * FROM students WHERE name LIKE ? OR email LIKE ?`;
     db.query(sql, [`%${search}%`, `%${search}%`], (err, results) => {
         if (err) throw err;
-        res.render('students/index', { students: results, user: req.session.user });
+        res.render('students/index', { students: results, user: req.session.user, search: search });
     });
 });
 
