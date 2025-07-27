@@ -15,14 +15,23 @@
         padding-top: 45px;
     }
 
-    body{
+    body {
         background-image: url('/image/schools_background.png');
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
         background-attachment: fixed;
     }
+
     a {
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    nav a:hover {
+        text-decoration: underline !important;
+    }
+
+    .card {
         font-family: 'Quicksand', sans-serif;
     }
 </style>
@@ -30,110 +39,68 @@
 <body>
 
 <nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
-
-    <style>
-    nav a:hover {
-      text-decoration: underline !important;
-    }
-    </style>
-
     <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="flex: 1; text-align: left;">
+            <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
+                Singapore IG Connect
+            </a>
+        </div>
 
-    <div style="flex: 1; text-align: left;">
-      <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
-        Singapore IG Connect
-      </a>
+        <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+            <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
+            <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+            <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+            <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
+            <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+            <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+        </div>
     </div>
-
-    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
-        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
-        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
-        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
-        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
-        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
-        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
-    </div>
-
-  </div>
 </nav>
 
-<div class="container mt-5" style="font-family: 'Quicksand', sans-serif;">
-  <h2 class="mb-4 text-center">Edit Student</h2>
+<!-- Main Content -->
+<div class="container mt-5" style="padding-top: 80px; font-family: 'Quicksand', sans-serif;">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0" style="font-weight: bold;">Edit Student</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/students/update/<%= student.id %>">
+                <div class="mb-3">
+                    <label for="name" class="form-label" style="font-weight: bold;">Student Name:</label>
+                    <input type="text" id="name" name="name" class="form-control" value="<%= student.name %>" required />
+                </div>
 
-  <form method="POST" action="/students/update/<%= student.id %>">
-    <div class="mb-3">
-        <label for="name" class="form-label">Name:</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            name="name" 
-            id="name" 
-            value="<%= student.name %>" 
-            required
-        >
+                <div class="mb-3">
+                    <label for="school_id" class="form-label" style="font-weight: bold;">School ID:</label>
+                    <input type="number" id="school_id" name="school_id" class="form-control" value="<%= student.school_id %>" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label" style="font-weight: bold;">Email Address:</label>
+                    <input type="email" id="email" name="email" class="form-control" value="<%= student.email %>" required />
+                </div>
+
+                <div class="mb-3">
+                    <label for="interests" class="form-label" style="font-weight: bold;">Interests:</label>
+                    <input type="text" id="interests" name="interests" class="form-control" value="<%= student.interests %>" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="profile_pic" class="form-label" style="font-weight: bold;">Profile Picture Filename:</label>
+                    <input type="text" id="profile_pic" name="profile_pic" class="form-control" value="<%= student.profile_pic %>" />
+                    <% if (student.profile_pic) { %>
+                        <img src="/image/<%= student.profile_pic %>" class="img-thumbnail mt-2" style="max-width: 150px;" />
+                    <% } %>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Update Student</button>
+                    <a href="/students" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-
-    <div class="mb-3">
-        <label for="school_id" class="form-label">School ID:</label>
-        <input 
-            type="number" 
-            class="form-control" 
-            name="school_id" 
-            id="school_id" 
-            value="<%= student.school_id %>" 
-            required
-        >
-    </div>
-
-
-    <div class="mb-3">
-        <label for="interests" class="form-label">Interests:</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            name="interests" 
-            id="interests" 
-            value="<%= student.interests %>"
-        >
-    </div>
-
-
-    <div class="mb-3">
-    <label for="email" class="form-label">Email:</label>
-        <input 
-            type="email" 
-            class="form-control" 
-            name="email" 
-            id="email" 
-            value="<%= student.email %>" 
-            required
-        >
-    </div>
-
-
-    <div class="mb-3">
-        <label for="profile_pic" class="form-label">Profile Picture URL:</label>
-        <input 
-            type="text" 
-            class="form-control" 
-            name="profile_pic" 
-            id="profile_pic" 
-            value="<%= student.profile_pic %>"
-        >
-        <% if (student.profile_pic) { %>
-            <div class="mt-2">
-                <img src="<%= student.profile_pic %>" alt="Current Image" width="100">
-            </div>
-        <% } %>
-    </div>
-
-
-    <div class="text-center">
-      <button type="submit" class="btn btn-primary">Update Student</button>
-      <a href="/students" class="btn btn-secondary ms-2">Cancel</a>
-    </div>
-  </form>
 </div>
+
 </body>
 </html>
