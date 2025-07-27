@@ -4,37 +4,81 @@
   <meta charset="UTF-8" />
   <title>New Student</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
 </head>
+
+<style>
+  body{
+    background-image: url('/image/schools_background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+  }
+
+  a {
+    font-family: 'Quicksand', sans-serif;
+  }
+</style>
 <body>
-  <div class="container mt-5">
+
+<nav style="position: fixed; top: 0; width: 100%; background-color: transparent; padding: 15px 30px; z-index: 1000;">
+
+    <style>
+    nav a:hover {
+      text-decoration: underline !important;
+    }
+    </style>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="flex: 1; text-align: left;">
+      <a href="/" style="color: black; font-size: 20px; font-family: 'Montserrat'; font-weight: bold; text-decoration: none;">
+        Singapore IG Connect
+      </a>
+    </div>
+
+    <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 20px;">
+        <a href="/interestgroups" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Interest Groups</a>
+        <a href="/members" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Members</a>
+        <a href="/events" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Events</a>
+        <a href="/schools" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">School Directory</a>
+        <a href="/students" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">Student Profiles</a>
+        <a href="/galleries" style="color:#FE3E4D; text-decoration: none; font-weight: normal; font-size:15px;">IG Galleries</a>
+    </div>
+
+  </div>
+</nav>
+
+  <div class="container mt-5" style="padding-top: 80px; font-family: 'Quicksand', sans-serif;">
     <div class="card shadow-lg border-0">
       <div class="card-header bg-primary text-white">
-        <h4 class="mb-0">Add New Student</h4>
+        <h4 class="mb-0" style="font-weight: bold;">Add New Student</h4>
       </div>
       <div class="card-body">
         <form action="/students" method="POST">
           <div class="mb-3">
-            <label for="name" class="form-label">Student Name</label>
+            <label for="name" class="form-label" style="font-weight: bold;">Student Name:</label>
             <input type="text" id="name" name="name" class="form-control" required />
           </div>
 
           <div class="mb-3">
-            <label for="school_id" class="form-label">School ID</label>
+            <label for="school_id" class="form-label" style="font-weight: bold;">School ID:</label>
             <input type="text" id="school_id" name="school_id" class="form-control" required />
           </div>
 
           <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
+            <label for="email" class="form-label" style="font-weight: bold;">Email Address:</label>
             <input type="email" id="email" name="email" class="form-control" required />
           </div>
 
           <div class="mb-3">
-            <label for="interests" class="form-label">Interests</label>
+            <label for="interests" class="form-label" style="font-weight: bold;">Interests:</label>
             <input type="text" id="interests" name="interests" class="form-control" />
           </div>
 
           <div class="mb-3">
-            <label for="profile_pic" class="form-label">Profile Picture Filename</label>
+            <label for="profile_pic" class="form-label" style="font-weight: bold;">Profile Picture Filename:</label>
             <input type="text" id="profile_pic" name="profile_pic" class="form-control" placeholder="e.g. inarah.jpg" />
           </div>
 
