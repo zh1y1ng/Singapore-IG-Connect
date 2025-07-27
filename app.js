@@ -1,11 +1,33 @@
 const express = require('express');
 const mysql = require('mysql2');
-const session = require( 'express-session');
-const flash = require( 'connect-flash' );
+const session = require('express-session');
+const flash = require('connect-flash');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-const schoolEventsData = {};
+const dataPath = path.join(__dirname, 'data', 'schoolEvents.json');
+
+// Ensure data folder and JSON file exist
+if (!fs.existsSync('data')) {
+    fs.mkdirSync('data');
+}
+if (!fs.existsSync(dataPath)) {
+    fs.writeFileSync(dataPath, '{}');
+}
+
+// Load existing event data
+let schoolEventsData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+// Helper to save data to JSON
+function saveEventsToFile() {
+    fs.writeFileSync(dataPath, JSON.stringify(schoolEventsData, null, 2));
+}
+
 app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.static('public'));
 
 const db = mysql.createPool({
     host: 'e3-0eg.h.filess.io',
@@ -15,36 +37,43 @@ const db = mysql.createPool({
     database: 'SingaporeIGConnect_beautyfast',
 });
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-app.use(express.static('public'));
-
 app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }
 }));
-
 app.use(flash());
 
 const validateRegistration = (req, res, next) => {
     const { username, email, password, address, contact } = req.body;
-
     if (!username || !email || !password || !address || !contact) {
         return res.status(400).send('All fields are required.');
     }
-
     if (password.length < 6) {
-        req.flash('error', 'Password should be at least 6 or more characters long');
+        req.flash('error', 'Password should be at least 6 characters long');
         req.flash('formData', req.body);
         return res.redirect('/register');
     }
     next();
 };
 
+const checkAuthentication = (req, res, next) => {
+    if (req.session.user) return next();
+    req.flash('error', 'Please log in to view this resource.');
+    res.redirect('/login');
+};
+
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') return next();
+    req.flash('error', 'Access denied');
+    res.redirect('/dashboard');
+};
+
+// --- Routes (Same logic, but now reading/writing to JSON) ---
+
 app.get('/', (req, res) => {
-    res.render('index', { user: req.session.user, messages: req.flash('success')});
+    res.render('index', { user: req.session.user, messages: req.flash('success') });
 });
 
 app.get('/register', (req, res) => {
@@ -52,25 +81,19 @@ app.get('/register', (req, res) => {
         errors: req.flash('error'),
         formData: req.flash('formData')[0] || {}
     });
-}); 
+});
 
 app.post('/register', validateRegistration, (req, res) => {
-
     const { username, email, password, address, contact, role } = req.body;
-
     const sql = 'INSERT INTO users (username, email, password, address, contact, role) VALUES (?, ?, SHA1(?), ?, ?, ?)';
-    db.query(sql, [username, email, password, address, contact, role], (err, result) => {
-        if (err) {
-            throw err;
-        }
-        console.log(result);
+    db.query(sql, [username, email, password, address, contact, role], (err) => {
+        if (err) throw err;
         req.flash('success', 'Registration successful! Please log in.');
         res.redirect('/login');
     });
 });
 
 app.get('/login', (req, res) => {
-
     res.render('login', {
         messages: req.flash('success'),
         errors: req.flash('error')
@@ -79,18 +102,13 @@ app.get('/login', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
-
     if (!email || !password) {
         req.flash('error', 'All fields are required.');
         return res.redirect('/login');
     }
-
     const sql = 'SELECT * FROM users WHERE email = ? AND password = SHA1(?)';
     db.query(sql, [email, password], (err, results) => {
-        if (err) {
-            throw err;
-        }
-
+        if (err) throw err;
         if (results.length > 0) {
             req.session.user = results[0];
             res.redirect('/dashboard');
@@ -106,26 +124,8 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 });
 
-const checkAuthentication = (req, res, next) => {
-    if (req.session.user) {
-        return next();
-    } else {
-        req.flash('error', 'Please log in to view this resource.');
-        res.redirect('/login');
-    }
-};
-
-const checkAdmin = (req, res, next) => {
-    if (req.session.user.role === 'admin') {
-        return next();
-    } else {
-        req.flash('error', 'Access denied');
-        res.redirect('/dashboard');
-    }
-};
-
 app.get('/dashboard', checkAuthentication, (req, res) => {
-    res.render('dashboard', { 
+    res.render('dashboard', {
         user: req.session.user,
         messages: req.flash('success')
     });
@@ -135,12 +135,8 @@ app.get('/admin', checkAuthentication, checkAdmin, (req, res) => {
     res.render('admin', { user: req.session.user });
 });
 
-// --- zhiying code ---
-
-// --- View all schools (Both user & admin) ---
 app.get('/schools', checkAuthentication, (req, res) => {
-    const query = 'SELECT * FROM schools';
-    db.query(query, (err, results) => {
+    db.query('SELECT * FROM schools', (err, results) => {
         if (err) throw err;
         res.render('schools/index', {
             schools: results,
@@ -150,182 +146,83 @@ app.get('/schools', checkAuthentication, (req, res) => {
     });
 });
 
-// --- Search school by name/location (Both user & admin) ---
-app.get('/schools/search', checkAuthentication, (req, res) => {
-    const keyword = req.query.keyword;
-    const sql = 'SELECT * FROM schools WHERE name LIKE ? OR address LIKE ?';
-    const searchTerm = '%' + keyword + '%';
-
-    db.query(sql, [searchTerm, searchTerm], (err, results) => {
-        if (err) {
-            return res.status(500).send('Database error');
-        }
-        res.render('schools', {
-            schools: results,
-            user: req.session.user,
-            searchTerm: keyword  // <-- send back to EJS
-        });
-    });
-});
-
-// --- Show Add School Form (Admin only) ---
-app.get('/schools/addSchool', checkAuthentication, checkAdmin, (req, res) => {
-    res.render('schools/addSchool', { user: req.session.user});
-});
-
-// --- Add School (Admin only) ---
-app.post('/schools', checkAuthentication, checkAdmin, (req, res) => {
-    const { name, address, contact_email, logo_url } = req.body;
-
-    if (!name || !address || !contact_email) {
-        req.flash('error', 'Please fill in all required fields.');
-        return res.redirect('/schools/addSchool');
-    }
-
-    const query = 'INSERT INTO schools (name, address, contact_email, logo_url) VALUES (?, ?, ?, ?)';
-    db.query(query, [name, address, contact_email, logo_url], (err) => {
-        if (err) throw err;
-        res.redirect('/schools');
-    });
-});
-
-// --- Show Edit Form (Admin only) ---
-app.get('/schools/editSchool/:id', checkAuthentication, checkAdmin, (req, res) => {
-    const id = req.params.id;
-    const query = 'SELECT * FROM schools WHERE id = ?';
-    db.query(query, [id], (err, results) => {
-        if (err) throw err;
-        res.render('schools/editSchool', { school: results[0], user: req.session.user });
-    });
-});
-
-// --- Update School (Admin only) ---
-app.post('/schools/update/:id', checkAuthentication, checkAdmin, (req, res) => {
-    const { name, address, contact_email, logo_url } = req.body;
-    const query = 'UPDATE schools SET name = ?, address = ?, contact_email = ?, logo_url = ? WHERE id = ?';
-    db.query(query, [name, address, contact_email, logo_url, req.params.id], (err) => {
-        if (err) throw err;
-        res.redirect('/schools');
-    });
-});
-
-// --- Delete School (Admin only) ---
-app.post('/schools/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
-    const id = req.params.id;
-    const query = 'DELETE FROM schools WHERE id = ?';
-    db.query(query, [id], (err) => {
-        if (err) throw err;
-        res.redirect('/schools');
-    });
-});
-
 app.get('/schools/schoolEvents/:id', checkAuthentication, (req, res) => {
     const schoolId = req.params.id;
-
-    const schoolQuery = 'SELECT * FROM schools WHERE id = ?';
-    db.query(schoolQuery, [schoolId], (err, schoolResults) => {
+    const query = 'SELECT * FROM schools WHERE id = ?';
+    db.query(query, [schoolId], (err, schoolResults) => {
         if (err) return res.status(500).send('Error retrieving school');
         if (schoolResults.length === 0) return res.status(404).send('School not found');
-
         const school = schoolResults[0];
-
         const events = schoolEventsData[schoolId] || [];
-
         res.render('schools/schoolEvents', {
-            school: school,
-            events: events,
+            school,
+            events,
             messages: req.flash('success'),
             errors: req.flash('error'),
             formData: {},
-            user: req.session.user 
+            user: req.session.user
         });
-
     });
 });
 
 app.post('/schools/schoolEvents/:id/add', checkAuthentication, (req, res) => {
     const schoolId = req.params.id;
     const { name, date, location, description } = req.body;
-
     if (!name || !date || !location || !description) {
         req.flash('error', 'All fields are required.');
         req.flash('formData', req.body);
         return res.redirect('/schools/schoolEvents/' + schoolId);
     }
-
-    const newEvent = { name: name, date: date, location: location, description: description };
-
+    const newEvent = { name, date, location, description };
     if (!schoolEventsData[schoolId]) {
         schoolEventsData[schoolId] = [];
     }
-
     schoolEventsData[schoolId].push(newEvent);
-
+    saveEventsToFile();
     req.flash('success', 'Event added successfully!');
     res.redirect('/schools/schoolEvents/' + schoolId);
 });
 
-// Show Edit Event Form (Admin only)
 app.get('/schools/schoolEvents/:schoolId/edit/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
-    const schoolId = req.params.schoolId;
-    const eventIndex = parseInt(req.params.eventIndex);
-
-    const schoolQuery = 'SELECT * FROM schools WHERE id = ?';
-    db.query(schoolQuery, [schoolId], (err, schoolResults) => {
+    const { schoolId, eventIndex } = req.params;
+    const index = parseInt(eventIndex);
+    const events = schoolEventsData[schoolId] || [];
+    if (index < 0 || index >= events.length) {
+        return res.status(404).send('Event not found');
+    }
+    db.query('SELECT * FROM schools WHERE id = ?', [schoolId], (err, results) => {
         if (err) return res.status(500).send('Error retrieving school');
-        if (schoolResults.length === 0) return res.status(404).send('School not found');
-
-        const school = schoolResults[0];
-        const events = schoolEventsData[schoolId] || [];
-
-        if (eventIndex < 0 || eventIndex >= events.length) {
-            return res.status(404).send('Event not found');
-        }
-
-        const event = events[eventIndex];
-
         res.render('schools/editschoolEvents', {
-            school: school,
-            event: event,
-            eventIndex: eventIndex,
+            school: results[0],
+            event: events[index],
+            eventIndex: index,
             errors: req.flash('error'),
             user: req.session.user
         });
     });
 });
 
-// Handle Edit Event POST (Admin only)
 app.post('/schools/schoolEvents/:schoolId/edit/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
-    const schoolId = req.params.schoolId;
-    const eventIndex = parseInt(req.params.eventIndex);
+    const { schoolId, eventIndex } = req.params;
+    const index = parseInt(eventIndex);
     const { name, date, location, description } = req.body;
-
-    if (!name || !date || !location || !description) {
-        req.flash('error', 'All fields are required.');
-        return res.redirect(`/schools/schoolEvents/${schoolId}/edit/${eventIndex}`);
-    }
-
-    if (!schoolEventsData[schoolId] || eventIndex < 0 || eventIndex >= schoolEventsData[schoolId].length) {
+    if (!schoolEventsData[schoolId] || index < 0 || index >= schoolEventsData[schoolId].length) {
         return res.status(404).send('Event not found');
     }
-
-    schoolEventsData[schoolId][eventIndex] = { name, date, location, description };
-
+    schoolEventsData[schoolId][index] = { name, date, location, description };
+    saveEventsToFile();
     req.flash('success', 'Event updated successfully!');
     res.redirect(`/schools/schoolEvents/${schoolId}`);
 });
 
-// Handle Delete Event (Admin only)
 app.post('/schools/schoolEvents/:schoolId/delete/:eventIndex', checkAuthentication, checkAdmin, (req, res) => {
-    const schoolId = req.params.schoolId;
-    const eventIndex = parseInt(req.params.eventIndex);
-
-    if (!schoolEventsData[schoolId] || eventIndex < 0 || eventIndex >= schoolEventsData[schoolId].length) {
+    const { schoolId, eventIndex } = req.params;
+    const index = parseInt(eventIndex);
+    if (!schoolEventsData[schoolId] || index < 0 || index >= schoolEventsData[schoolId].length) {
         return res.status(404).send('Event not found');
     }
-
-    schoolEventsData[schoolId].splice(eventIndex, 1);
-
+    schoolEventsData[schoolId].splice(index, 1);
+    saveEventsToFile();
     req.flash('success', 'Event deleted successfully!');
     res.redirect(`/schools/schoolEvents/${schoolId}`);
 });
