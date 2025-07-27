@@ -148,6 +148,18 @@
 <div class="container page-container">
     <div class="top-section">
     <h1 class="fw-bold">Welcome, <%= user.username %> (<%= user.role %>)</h1>
+    
+    <p style="margin-top: 25px;">
+      <a href="/announcements" style="font-size: 16px; text-decoration: underline; color: #007bff;">
+        📢 View Announcements
+      </a>
+      <% if (user.role === 'admin') { %>
+        |
+        <a href="/announcements/new_announcement" style="font-size: 16px; text-decoration: underline; color: #28a745;">
+          ➕ Post New Announcement
+        </a>
+      <% } %>
+    </p>
 
     <% if (messages.length > 0) { %>
         <div class="alert alert-success mt-3"><%= messages[0] %></div>

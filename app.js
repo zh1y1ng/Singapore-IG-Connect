@@ -330,6 +330,105 @@ app.post('/schools/schoolEvents/:schoolId/delete/:eventIndex', checkAuthenticati
     res.redirect(`/schools/schoolEvents/${schoolId}`);
 });
 
+// View All Announcements (User + Admin)
+app.get('/announcements', checkAuthentication, (req, res) => {
+    const query = 'SELECT * FROM announcements ORDER BY date_posted DESC';
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        res.render('announcements/index', {
+            announcements: results,
+            user: req.session.user,
+            messages: req.flash('success')
+        });
+    });
+});
+
+// Search Announcements (by title or author)
+app.get('/announcements/search', checkAuthentication, (req, res) => {
+    const keyword = req.query.keyword;
+    const sql = 'SELECT * FROM announcements WHERE title LIKE ? OR author LIKE ? ORDER BY date_posted DESC';
+    const searchTerm = '%' + keyword + '%';
+
+    db.query(sql, [searchTerm, searchTerm], (err, results) => {
+        if (err) throw err;
+        res.render('announcements/index', {
+            announcements: results,
+            user: req.session.user,
+            messages: req.flash('success')
+        });
+    });
+});
+
+// Show Add Form (Admin only)
+app.get('/announcements/add', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('announcements/addAnnouncement', {
+        user: req.session.user,
+        errors: req.flash('error')
+    });
+});
+
+// Handle Add Form (Admin only)
+app.post('/announcements', checkAuthentication, checkAdmin, (req, res) => {
+    const { title, content, author } = req.body;
+
+    if (!title || !content || !author) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/announcements/add');
+    }
+
+    const date_posted = new Date().toISOString().slice(0, 10);
+    const sql = 'INSERT INTO announcements (title, content, author, date_posted) VALUES (?, ?, ?, ?)';
+    db.query(sql, [title, content, author, date_posted], (err) => {
+        if (err) throw err;
+        req.flash('success', 'Announcement added successfully!');
+        res.redirect('/announcements');
+    });
+});
+
+// Show Edit Form (Admin only)
+app.get('/announcements/edit/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const sql = 'SELECT * FROM announcements WHERE id = ?';
+    db.query(sql, [id], (err, results) => {
+        if (err) throw err;
+        if (results.length === 0) return res.status(404).send('Announcement not found');
+        res.render('announcements/editAnnouncement', {
+            announcement: results[0],
+            user: req.session.user,
+            errors: req.flash('error')
+        });
+    });
+});
+
+// Handle Update (Admin only)
+app.post('/announcements/update/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const { title, content, author } = req.body;
+    const id = req.params.id;
+
+    if (!title || !content || !author) {
+        req.flash('error', 'All fields are required.');
+        return res.redirect('/announcements/edit/' + id);
+    }
+
+    const sql = 'UPDATE announcements SET title = ?, content = ?, author = ? WHERE id = ?';
+    db.query(sql, [title, content, author, id], (err) => {
+        if (err) throw err;
+        req.flash('success', 'Announcement updated successfully!');
+        res.redirect('/announcements');
+    });
+});
+
+// Handle Delete (Admin only)
+app.post('/announcements/delete/:id', checkAuthentication, checkAdmin, (req, res) => {
+    const id = req.params.id;
+    const sql = 'DELETE FROM announcements WHERE id = ?';
+    db.query(sql, [id], (err) => {
+        if (err) throw err;
+        req.flash('success', 'Announcement deleted.');
+        res.redirect('/announcements');
+    });
+});
+
 // --- basil ---
 
 // view and searchs IGs
