@@ -611,19 +611,6 @@ app.get('/search-events', (req, res) => {
     });
 });
 
-app.get('/aboutus', (req, res) => {
-    res.render('aboutus', { user: req.session.user, messages: req.flash('success') });
-});
-
-
-
-app.get('/contactus', (req, res) => {
-    res.render('contactus', { user: req.session.user, messages: req.flash('success') });
-});
-
-
-
-
 // --- pekwen code ------------------------
 
 // IG Galleries Routes
@@ -689,6 +676,16 @@ app.post('/galleries/:id/delete', checkAuthentication, checkAdmin, (req, res) =>
         if (err) throw err;
         res.redirect('/galleries');
     });
+});
+
+app.get('/aboutus', (req, res) => {
+    res.render('aboutus', { user: req.session.user, messages: req.flash('success') });
+});
+
+
+
+app.get('/contactus', (req, res) => {
+    res.render('contactus', { user: req.session.user, messages: req.flash('success') });
 });
 
 // --- inarah ---------
