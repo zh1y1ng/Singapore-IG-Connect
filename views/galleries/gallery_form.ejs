@@ -61,13 +61,14 @@
   </div>
 </nav>
 
-<% function formatDateLocal(date) {
-     var d = new Date(date);
-     var year = d.getFullYear();
-     var month = ('0' + (d.getMonth() + 1)).slice(-2);
-     var day = ('0' + d.getDate()).slice(-2);
-     return year + '-' + month + '-' + day;
-} %>
+<%
+// Simple UTC+8 formatter for Singapore time
+function formatDateUTC8(date) {
+  const d = new Date(date);
+  const localDate = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  return localDate.toISOString().split('T')[0];
+}
+%>
 
 <div 
   class="bg-fullpage" 
@@ -128,7 +129,7 @@
         class="form-control"
         id="upload_date"
         name="upload_date"
-        value="<%= gallery ? formatDateLocal(gallery.upload_date) : '' %>"
+        value="<%= gallery ? formatDateLocalUTC8(gallery.upload_date) : '' %>"
         required
       >
     </div>
