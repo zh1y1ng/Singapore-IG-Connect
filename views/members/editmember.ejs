@@ -50,8 +50,17 @@
             <label class="form-label">Role</label>
             <input type="text" name="role" class="form-control" value="<%= member.role %>" required>
         </div>
+        <div class="mb-3">
+            <label class="form-label" style="font-weight: bold;">Joined Date:</label>
+            <input type="date" name="joined_date" class="form-control" value="<%= member.joined_date.toISOString().split('T')[0] %>" required>
+        </div>
         <button type="submit" class="btn btn-primary">Update Role</button>
     </form>
 </div>
+
+  <div style="text-align: center;">
+    <a href="/members" class="btn btn-secondary mt-3" style="font-family: 'Quicksand', sans-serif;">Back to Members</a>
+  </div>
+
 </body>
 </html>
