@@ -345,19 +345,23 @@ app.get('/announcements', checkAuthentication, (req, res) => {
 
 // Search Announcements (by title or author)
 app.get('/announcements/search', checkAuthentication, (req, res) => {
-    const keyword = req.query.keyword;
-    const sql = 'SELECT * FROM announcements WHERE title LIKE ? OR author LIKE ? ORDER BY date_posted DESC';
-    const searchTerm = '%' + keyword + '%';
+  const keyword = req.query.keyword;
+  const searchTerm = `%${keyword}%`;
 
-    db.query(sql, [searchTerm, searchTerm], (err, results) => {
-        if (err) throw err;
-        res.render('announcements/index', {
-            announcements: results,
-            user: req.session.user,
-            messages: req.flash('success')
-        });
+  const sql = `
+    SELECT * FROM announcements 
+    WHERE title LIKE ? OR content LIKE ? OR author LIKE ?
+  `;
+
+  db.query(sql, [searchTerm, searchTerm, searchTerm], (err, results) => {
+    if (err) return res.status(500).send('Database error');
+    res.render('announcements/index', {
+      announcements: results,
+      user: req.session.user
     });
+  });
 });
+
 
 // Show Add Form (Admin only)
 app.get('/announcements/new_announcement', checkAuthentication, checkAdmin, (req, res) => {
