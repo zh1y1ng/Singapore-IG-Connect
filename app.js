@@ -444,6 +444,34 @@ app.get('/interestgroups', checkAuthentication, (req, res) => {
     });
 });
 
+// View all Interest Groups
+app.get('/interestgroups', checkAuthentication, (req, res) => {
+    const sql = 'SELECT * FROM interest_groups';
+    db.query(sql, (err, results) => {
+        if (err) throw err;
+        res.render('interestgroups/index', {
+            interest_groups: results,
+            user: req.session.user
+        });
+    });
+});
+
+// Search Interest Groups (by keyword)
+app.get('/interestgroups/search', checkAuthentication, (req, res) => {
+    const keyword = `%${req.query.keyword}%`;
+    const sql = `
+        SELECT * FROM interest_groups 
+        WHERE name LIKE ? OR category LIKE ? OR description LIKE ?`;
+
+    db.query(sql, [keyword, keyword, keyword], (err, results) => {
+        if (err) throw err;
+        res.render('interestgroups/index', {
+            interest_groups: results,
+            user: req.session.user
+        });
+    });
+});
+
 // add new IG - Admin
 app.get('/interestgroups/add', checkAuthentication, checkAdmin, (req, res) => {
     res.render('interestgroups/add'); // Make sure your file is views/ig/addIg.ejs
