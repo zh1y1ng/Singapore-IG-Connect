@@ -128,7 +128,7 @@ function formatDateLocal(date) {
         class="form-control"
         id="upload_date"
         name="upload_date"
-        value="<%= gallery ? formatDateLocal(gallery.upload_date) : '' %>"
+        value="<%= gallery ? gallery.upload_date.toISOString().split('T')[0] : '' %>"
         required
 >
 </div>
