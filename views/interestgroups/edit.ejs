@@ -38,7 +38,7 @@
 
 <div class="container mt-5 pt-4">
     <h2>Edit Interest Group</h2>
-    <form action="/interestgroups/<%= ig.id %>?_method=PUT" method="POST">
+    <form action="/interestgroups/<%= ig.id %>? method="POST">
         <div class="mb-3">
             <label class="form-label">Name</label>
             <input type="text" name="name" class="form-control" value="<%= ig.name %>" required>
@@ -49,13 +49,14 @@
         </div>
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control"><%= ig.description %></textarea>
+            <input type="text" name="description" class="form-control"><%= ig.description % required>
         </div>
         <div class="mb-3">
             <label class="form-label">Meeting Schedule</label>
-            <textarea name="meeting_schedule" class="form-control"><%= ig.meeting_schedule %></textarea>
+            <input type="text" name="meeting_schedule" class="form-control"><%= ig.meeting_schedule %> required>
         </div>
         <button type="submit" class="btn btn-primary">Update IG</button>
+        <a href="/interestgroups" class="btn btn-secondary ms-2">Cancel</a>
     </form>
 </div>
 
