@@ -360,8 +360,8 @@ app.get('/announcements/search', checkAuthentication, (req, res) => {
 });
 
 // Show Add Form (Admin only)
-app.get('/announcements/add', checkAuthentication, checkAdmin, (req, res) => {
-    res.render('announcements/addAnnouncement', {
+app.get('/announcements/new_announcement', checkAuthentication, checkAdmin, (req, res) => {
+    res.render('announcements/new_announcement', {
         user: req.session.user,
         errors: req.flash('error')
     });

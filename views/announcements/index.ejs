@@ -139,38 +139,35 @@
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
-    <table>
-      <tr>
-        <th>Title</th>
-        <th>Date</th>
-        <th>Posted By</th>
-        <th>Actions</th>
-      </tr>
-
+    <div class="container mt-4">
       <% for (let i = 0; i < announcements.length; i++) { %>
-        <tr data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
-          <td><%= announcements[i].title %></td>
-          <td><%= announcements[i].date_posted %></td>
-          <td><%= announcements[i].author %></td>
-          <td class="action-links">
-            <% if (user.role === 'admin') { %>
-              <a href="/announcements/edit/<%= announcements[i].id %>">Edit</a>
-              <a href="/announcements/delete/<%= announcements[i].id %>">Delete</a>
-            <% } else { %>
-              N/A
-            <% } %>
-          </td>
-        </tr>
+        <div class="card mb-3" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
+          <div class="card-body">
+            <h5 class="card-title"><%= announcements[i].title %></h5>
+            <h6 class="card-subtitle mb-2 text-muted">
+              Posted on <%= announcements[i].date_posted %> by <%= announcements[i].author %>
+            </h6>
+
+            <div class="mt-3">
+              <% if (user.role === 'admin') { %>
+                <a href="/announcements/edit/<%= announcements[i].id %>" class="card-link text-primary">Edit</a>
+                <a href="/announcements/delete/<%= announcements[i].id %>" class="card-link text-danger">Delete</a>
+              <% } else { %>
+                <span class="text-muted">No actions available</span>
+              <% } %>
+            </div>
+          </div>
+        </div>
       <% } %>
-    </table>
+    </div>
 
-    <% if (user.role === 'admin') { %>
-      <div class="add-btn" data-aos="zoom-in">
-        <a href="/announcements/add" class="btn btn-success">➕ Post New Announcement</a>
+        <% if (user.role === 'admin') { %>
+          <div class="add-btn" data-aos="zoom-in">
+            <a href="/announcements/new_announcement" class="btn btn-success">➕ Post New Announcement</a>
+          </div>
+        <% } %>
+
       </div>
-    <% } %>
-
-  </div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
