@@ -1,5 +1,5 @@
 <h1>Edit Interest Group</h1>
-<form action="/igs/<%= ig.id %>?_method=PUT" method="POST">
+<form action="/interestgroups/<%= ig.id %>?_method=PUT" method="POST">
   <input type="text" name="name" value="<%= ig.name %>" required><br>
   <input type="text" name="category" value="<%= ig.category %>" required><br>
   <textarea name="description"><%= ig.description %></textarea><br>

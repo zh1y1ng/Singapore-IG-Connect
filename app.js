@@ -392,7 +392,7 @@ app.get('/announcements/edit/:id', checkAuthentication, checkAdmin, (req, res) =
     db.query(sql, [id], (err, results) => {
         if (err) throw err;
         if (results.length === 0) return res.status(404).send('Announcement not found');
-        res.render('announcements/editAnnouncement', {
+        res.render('announcements/edit_announcement', {
             announcement: results[0],
             user: req.session.user,
             errors: req.flash('error')
@@ -407,7 +407,7 @@ app.post('/announcements/update/:id', checkAuthentication, checkAdmin, (req, res
 
     if (!title || !content || !author) {
         req.flash('error', 'All fields are required.');
-        return res.redirect('/announcements/edit/' + id);
+        return res.redirect('/announcements/edit_annoucement/' + id);
     }
 
     const sql = 'UPDATE announcements SET title = ?, content = ?, author = ? WHERE id = ?';

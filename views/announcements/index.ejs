@@ -139,6 +139,12 @@
       <button type="submit" class="btn btn-primary">Search</button>
     </form>
 
+    <% if (user.role === 'admin') { %>
+      <div class="add-btn" data-aos="zoom-in">
+        <a href="/announcements/new_announcement" class="btn btn-success">➕ Post New Announcement</a>
+      </div>
+    <% } %>
+
     <div class="container mt-4">
       <% for (let i = 0; i < announcements.length; i++) { %>
         <div class="card mb-3" data-aos="fade-up" data-aos-delay="<%= i * 100 %>">
@@ -147,6 +153,8 @@
             <h6 class="card-subtitle mb-2 text-muted">
               Posted on <%= announcements[i].date_posted %> by <%= announcements[i].author %>
             </h6>
+
+            <p class="card-text mt-3" style="white-space: pre-line;"><%= announcements[i].content %></p>
 
             <div class="mt-3">
               <% if (user.role === 'admin') { %>
@@ -160,14 +168,6 @@
         </div>
       <% } %>
     </div>
-
-        <% if (user.role === 'admin') { %>
-          <div class="add-btn" data-aos="zoom-in">
-            <a href="/announcements/new_announcement" class="btn btn-success">➕ Post New Announcement</a>
-          </div>
-        <% } %>
-
-      </div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
