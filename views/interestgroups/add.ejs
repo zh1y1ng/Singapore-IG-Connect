@@ -55,7 +55,7 @@
     </div>
 </nav>
 
-<div class="container mt-5 pt-5">
+<div class="container mt-5 pt-5" style="padding-top: 100px;">
     <h2>New Interest Group</h2>
     <form action="/interestgroups" method="POST" style="font-family: 'Quicksand', sans-serif;">
         <div class="mb-3">
@@ -68,11 +68,11 @@
         </div>
         <div class="mb-3">
             <label class="form-label" style="font-weight: bold;">Description:</label>
-            <textarea name="description" class="form-control" placeholder="Description"></textarea>
+            <input type="text" name="description" class="form-control" placeholder="Description" required>
         </div>
         <div class="mb-3">
             <label class="form-label" style="font-weight: bold;">Meeting Schedule:</label>
-            <textarea name="meeting_schedule" class="form-control" placeholder="Meeting Schedule"></textarea>
+            <input type="text" name="meeting_schedule" class="form-control" placeholder="Meeting Schedule" required>
         </div>
         <button type="submit" class="btn btn-primary">Add IG</button>
     </form>
