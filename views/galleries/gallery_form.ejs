@@ -65,7 +65,10 @@
 // Format date to UTC+8 (Singapore time)
 function formatDateUTC8(date) {
   const d = new Date(date);
-  const localDate = new Date(d.getTime() + 8 * 60 * 60 * 1000);
+  const year = d.getFullYear();
+  const month = ('0' + (d.getMonth() + 1)).slice(-2);
+  const day = ('0' + d.getDate()).slice(-2);
+  return year + '-' + month + '-' + day;
   return localDate.toISOString().split('T')[0];
 }
 %>
@@ -125,7 +128,7 @@ function formatDateUTC8(date) {
         class="form-control"
         id="upload_date"
         name="upload_date"
-        value="<%= gallery ? formatDateUTC8(gallery.upload_date) : '' %>"
+        value="<%= gallery ? formatDateLocal(gallery.upload_date) : '' %>"
         required
 >
 </div>
