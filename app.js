@@ -450,9 +450,9 @@ app.get('/interestgroups/add', checkAuthentication, checkAdmin, (req, res) => {
 });
 
 app.post('/interestgroups', checkAuthentication, checkAdmin, (req, res) => {
-    const { name, category, description } = req.body;
-    const sql = 'INSERT INTO interest_groups (name, category, description) VALUES (?, ?, ?)';
-    db.query(sql, [name, category, description], (err) => {
+    const { name, category, description, meeting_schedule } = req.body;
+    const sql = 'INSERT INTO interest_groups (name, category, description, meeting_schedule) VALUES (?, ?, ?, ?)';
+    db.query(sql, [name, category, description, meeting_schedule], (err) => {
         if (err) throw err;
         res.redirect('/interestgroups');
     });
@@ -474,9 +474,9 @@ app.get('/interestgroups/:id/edit', checkAuthentication, checkAdmin, (req, res) 
 
 app.post('/interestgroups/:id', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
-    const { name, category, description } = req.body;
-    const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ? WHERE id = ?';
-    db.query(sql, [name, category, description, id], (err) => {
+    const { name, category, description, meeting_schedule } = req.body;
+    const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ?, meeting_schedule = ?, WHERE id = ?';
+    db.query(sql, [name, category, description, meeting_schedule, id], (err) => {
         if (err) throw err;
         res.redirect('/interestgroups');
     });
