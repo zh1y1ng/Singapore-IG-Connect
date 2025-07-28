@@ -62,82 +62,77 @@
 </nav>
 
 <%
-// Simple UTC+8 formatter for Singapore time
+// Format date to UTC+8 (Singapore time)
 function formatDateUTC8(date) {
   const d = new Date(date);
   const localDate = new Date(d.getTime() + 8 * 60 * 60 * 1000);
   return localDate.toISOString().split('T')[0];
 }
 %>
-
-<div 
-  class="bg-fullpage" 
-  style="background-image: url('/image/gallery_background.png')">
-</div>
-
-<div class="container content-wrapper" style="max-width: 600px;">
-  <h2 class="mb-4" style="color: black"><%= gallery ? 'Edit Gallery Item' : 'Add New Gallery Item' %></h2>
-
+ 
+<div class="bg-fullpage" style="background-image: url('/image/gallery_background.png')"></div>
+ 
+<div class="container content-wrapper" style="max-width: 600px; font-family: 'Quicksand', sans-serif;">
+<h2 class="mb-4" style="color: black"><%= gallery ? 'Edit Gallery Item' : 'Add New Gallery Item' %></h2>
+ 
   <form action="<%= gallery ? '/galleries/' + gallery.id : '/galleries' %>" method="POST" novalidate>
-    
-    <div class="mb-3">
-      <label for="ig_id" style="color: black" class="form-label">Instagram Post ID</label>
-      <input
+<div class="mb-3">
+<label for="ig_id" style="color: black; font-weight: bold;" class="form-label">Instagram Post ID</label>
+<input
         type="text"
         class="form-control"
         id="ig_id"
         name="ig_id"
         value="<%= gallery ? gallery.ig_id : '' %>"
         required
-      >
-    </div>
-
+>
+</div>
+ 
     <div class="mb-3">
-      <label for="media_url" style="color: black" class="form-label">Media URL</label>
-      <input
+<label for="media_url" style="color: black; font-weight: bold;" class="form-label">Media URL</label>
+<input
         type="url"
         class="form-control"
         id="media_url"
         name="media_url"
         value="<%= gallery ? gallery.media_url : '' %>"
         required
-      >
-    </div>
-
+>
+</div>
+ 
     <% if (gallery && gallery.media_url) { %>
-      <div class="mb-3">
-        <label class="form-label" style="color: black">Current Media Preview</label><br>
-        <img src="<%= gallery.media_url %>" alt="Media Preview" class="img-thumbnail mb-2" style="max-width: 150px;">
-      </div>
-    <% } %>
-
+<div class="mb-3">
+<label class="form-label" style="color: black">Current Media Preview</label><br>
+<img src="<%= gallery.media_url %>" alt="Media Preview" class="img-thumbnail mb-2" style="max-width: 150px;">
+</div>
+<% } %>
+ 
     <div class="mb-3">
-      <label for="caption" style="color: black" class="form-label">Caption</label>
-      <textarea
+<label for="caption" style="color: black; font-weight: bold;" class="form-label">Caption</label>
+<textarea
         class="form-control"
         id="caption"
         name="caption"
         rows="3"
         required
-      ><%= gallery ? gallery.caption : '' %></textarea>
-    </div>
-
+><%= gallery ? gallery.caption : '' %></textarea>
+</div>
+ 
     <div class="mb-3">
-      <label for="upload_date" style="color: black" class="form-label">Upload Date</label>
-      <input
+<label for="upload_date" style="color: black; font-weight: bold;" class="form-label">Upload Date</label>
+<input
         type="date"
         class="form-control"
         id="upload_date"
         name="upload_date"
-        value="<%= gallery ? formatDateLocalUTC8(gallery.upload_date) : '' %>"
+        value="<%= gallery ? formatDateUTC8(gallery.upload_date) : '' %>"
         required
-      >
-    </div>
-
-    <button type="submit" class="btn btn-primary me-2"><%= gallery ? 'Update' : 'Add' %></button>
-    <a href="/galleries" class="btn btn-secondary">Cancel</a>
-  </form>
+>
 </div>
-
+ 
+    <button type="submit" class="btn btn-primary me-2"><%= gallery ? 'Update' : 'Add' %></button>
+<a href="/galleries" class="btn btn-secondary">Cancel</a>
+</form>
+</div>
+ 
 <%- include('../partials/footer') %>
-
