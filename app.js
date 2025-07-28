@@ -475,7 +475,7 @@ app.get('/interestgroups/:id/edit', checkAuthentication, checkAdmin, (req, res) 
 app.post('/interestgroups/:id', checkAuthentication, checkAdmin, (req, res) => {
     const id = req.params.id;
     const { name, category, description, meeting_schedule } = req.body;
-    const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ?, meeting_schedule = ?, WHERE id = ?';
+    const sql = 'UPDATE interest_groups SET name = ?, category = ?, description = ?, meeting_schedule = ? WHERE id = ?';
     db.query(sql, [name, category, description, meeting_schedule, id], (err) => {
         if (err) throw err;
         res.redirect('/interestgroups');
@@ -488,7 +488,7 @@ app.post('/interestgroups/:id/delete', checkAuthentication, checkAdmin, (req, re
     const sql = 'DELETE FROM interest_groups WHERE id = ?';
     db.query(sql, [req.params.id], (err) => {
         if (err) throw err;
-        res.redirect('/ig');
+        res.redirect('/interestgroups');
     });
 });
 
