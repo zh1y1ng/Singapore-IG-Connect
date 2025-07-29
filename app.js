@@ -150,6 +150,7 @@ app.get('/schools', checkAuthentication, (req, res) => {
     });
 });
 
+// -----------
 // --- Search school by name/location (Both user & admin) ---
 app.get('/schools/search', checkAuthentication, (req, res) => {
     const keyword = req.query.keyword;
